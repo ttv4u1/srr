@@ -1174,6 +1174,17 @@
           btn.disabled = false;
           return;
         }
+        
+        // Simpan ke records_metadata di Supabase juga
+        await supabaseClient.from('records_metadata').insert([{
+          user_id: currentUser.id,
+          record_type: 'wfb',
+          record_id: null,
+          tarikh: tcBulan + '-01',
+          jenis_data: 'Kad Waktu',
+          butiran: 'Rekod Kad Waktu Bulanan: ' + document.getElementById('tcNama').value,
+          kos: 0
+        }]);
       } else {
         // Simpan ke localStorage jika tiada sambungan Supabase
         saveToLocalStorage('wfb_records', {
@@ -1370,6 +1381,17 @@
           alert("Ralat Supabase: " + error.message + "\nData disimpan secara tempatan (localStorage).");
           return;
         }
+        
+        // Simpan ke records_metadata di Supabase juga
+        await supabaseClient.from('records_metadata').insert([{
+          user_id: currentUser.id,
+          record_type: 'logbook',
+          record_id: null,
+          tarikh: dataObj.tarikh !== '-' ? dataObj.tarikh : null,
+          jenis_data: 'Buku Log',
+          butiran: dataObj.tujuan,
+          kos: dataObj.kos ? parseFloat(dataObj.kos) : 0
+        }]);
       } else {
         // Simpan ke localStorage jika tiada sambungan Supabase
         saveToLocalStorage('logbook_records', {
