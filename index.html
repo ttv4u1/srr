@@ -953,6 +953,11 @@
           initApp();
           window.appInitialized = true;
         }
+        
+        // Muat data dari Supabase selepas login
+        setTimeout(() => {
+          loadFromSupabase();
+        }, 500);
 
         // Clean up the messy URL hash after login
         if (window.location.hash.includes('access_token')) {
@@ -990,6 +995,71 @@
       
       // Muat data dari localStorage jika ada
       loadFromLocalStorage();
+      
+      // Muat data dari Supabase jika logged in
+      if (supabaseClient && currentUser) {
+        loadFromSupabase();
+      }
+    }
+    
+    // Muat dan paparkan data dari Supabase
+    async function loadFromSupabase() {
+      try {
+        // Muat data dari records_metadata
+        const { data: metadataRecords, error: metaError } = await supabaseClient
+          .from('records_metadata')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (metaError) {
+          console.error('Ralat muat metadata:', metaError);
+        }
+        
+        if (metadataRecords && metadataRecords.length > 0) {
+          const tbody = document.getElementById('dataTableBody');
+          
+          // Semak jika ada "Tiada data"
+          if (tbody.innerHTML.includes('Tiada data')) {
+            tbody.innerHTML = '';
+          }
+          
+          metadataRecords.forEach(data => {
+            // Semak jika data sudah dipapar (dari localStorage)
+            const existingRows = tbody.querySelectorAll('tr');
+            let exists = false;
+            existingRows.forEach(row => {
+              const cells = row.querySelectorAll('td');
+              if (cells.length > 0 && cells[0].innerText === (data.tarikh || '-')) {
+                exists = true;
+              }
+            });
+            
+            if (!exists) {
+              const row = document.createElement('tr');
+              row.className = 'hover:bg-slate-800/50 transition-colors';
+              
+              const badgeClass = data.record_type === 'wfb' 
+                ? 'bg-blue-900/50 text-blue-300 border-blue-500/30' 
+                : 'bg-purple-900/50 text-purple-300 border-purple-500/30';
+              
+              row.innerHTML = `
+                <td class="p-4">${data.tarikh || '-'}</td>
+                <td class="p-4"><span class="${badgeClass} text-xs px-2 py-1 rounded border">${data.jenis_data || '-'}</span></td>
+                <td class="p-4 text-sm truncate max-w-xs">${data.butiran || '-'}</td>
+                <td class="p-4 text-emerald-400 font-bold">RM ${data.kos || '0'}</td>
+                <td class="p-4 text-cyan-400 text-xs">Supabase</td>
+              `;
+              tbody.prepend(row);
+            }
+          });
+          
+          // Kira jumlah kos dari Supabase
+          const total = metadataRecords.reduce((sum, item) => sum + (parseFloat(item.kos) || 0), 0);
+          document.getElementById('vlTotalKos').innerText = "RM " + total.toFixed(2);
+        }
+      } catch (e) {
+        console.error('Ralat muat data dari Supabase:', e);
+      }
     }
     
     // Muat dan paparkan data dari localStorage
@@ -1227,6 +1297,11 @@
         btn.disabled = false;
         SoundFX.success();
         alert("Data Kad Waktu berjaya disimpan dan boleh disemak di Pangkalan Data!");
+        
+        // Muat semula data dari Supabase
+        if (supabaseClient && currentUser) {
+          loadFromSupabase();
+        }
       }, 1000);
     }
 
@@ -1474,6 +1549,11 @@
 
       SoundFX.success();
       alert("Rekod perjalanan berjaya ditambah dan boleh disemak di Pangkalan Data!");
+      
+      // Muat semula data dari Supabase
+      if (supabaseClient && currentUser) {
+        loadFromSupabase();
+      }
     }
 
     // Fungsi Simpan ke LocalStorage (Fallback)
