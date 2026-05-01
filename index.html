@@ -996,43 +996,72 @@
     function loadFromLocalStorage() {
       const wfbData = getLocalStorageData('wfb_records');
       const logbookData = getLocalStorageData('logbook_records');
+      const metadataData = getLocalStorageData('records_metadata');
       
       const tbody = document.getElementById('dataTableBody');
       let hasData = false;
       
-      // Paparkan data WFB
-      wfbData.forEach(data => {
+      // Paparkan data dari records_metadata (PANGKALAN DATA REKOD)
+      metadataData.forEach(data => {
         hasData = true;
         const row = document.createElement('tr');
         row.className = 'hover:bg-slate-800/50 transition-colors';
-        row.innerHTML = `
-          <td class="p-4">${data.bulan || '-'} (Sepanjang Bulan)</td>
-          <td class="p-4"><span class="bg-blue-900/50 text-blue-300 text-xs px-2 py-1 rounded border border-blue-500/30">Kad Waktu</span></td>
-          <td class="p-4 text-sm truncate max-w-xs">Rekod Kedatangan (Local)</td>
-          <td class="p-4 text-amber-400 font-bold">-</td>
-          <td class="p-4 text-slate-500 text-xs">Simpanan Tempatan</td>
-        `;
-        tbody.prepend(row);
-      });
-      
-      // Paparkan data Logbook
-      logbookData.forEach(data => {
-        hasData = true;
-        const row = document.createElement('tr');
-        row.className = 'hover:bg-slate-800/50 transition-colors';
+        
+        const badgeClass = data.record_type === 'wfb' 
+          ? 'bg-blue-900/50 text-blue-300 border-blue-500/30' 
+          : 'bg-purple-900/50 text-purple-300 border-purple-500/30';
+        
         row.innerHTML = `
           <td class="p-4">${data.tarikh || '-'}</td>
-          <td class="p-4"><span class="bg-purple-900/50 text-purple-300 text-xs px-2 py-1 rounded border border-purple-500/30">Buku Log</span></td>
-          <td class="p-4 text-sm truncate max-w-xs">${data.tujuan || '-'}</td>
+          <td class="p-4"><span class="${badgeClass} text-xs px-2 py-1 rounded border">${data.jenis_data || '-'}</span></td>
+          <td class="p-4 text-sm truncate max-w-xs">${data.butiran || '-'}</td>
           <td class="p-4 text-emerald-400 font-bold">RM ${data.kos || '0'}</td>
           <td class="p-4 text-slate-500 text-xs">Simpanan Tempatan</td>
         `;
         tbody.prepend(row);
       });
       
-      // Kira jumlah kos dari localStorage
-      if (logbookData.length > 0) {
-        const total = logbookData.reduce((sum, item) => sum + (parseFloat(item.kos) || 0), 0);
+      // Paparkan data WFB (jika tiada metadata)
+      wfbData.forEach(data => {
+        // Semak jika sudah ada dalam metadata
+        const exists = metadataData.some(m => m.bulan === data.bulan && m.record_type === 'wfb');
+        if (!exists) {
+          hasData = true;
+          const row = document.createElement('tr');
+          row.className = 'hover:bg-slate-800/50 transition-colors';
+          row.innerHTML = `
+            <td class="p-4">${data.bulan || '-'} (Sepanjang Bulan)</td>
+            <td class="p-4"><span class="bg-blue-900/50 text-blue-300 text-xs px-2 py-1 rounded border border-blue-500/30">Kad Waktu</span></td>
+            <td class="p-4 text-sm truncate max-w-xs">Rekod Kedatangan (Local)</td>
+            <td class="p-4 text-amber-400 font-bold">-</td>
+            <td class="p-4 text-slate-500 text-xs">Simpanan Tempatan</td>
+          `;
+          tbody.prepend(row);
+        }
+      });
+      
+      // Paparkan data Logbook (jika tiada metadata)
+      logbookData.forEach(data => {
+        // Semak jika sudah ada dalam metadata
+        const exists = metadataData.some(m => m.tarikh === data.tarikh && m.record_type === 'logbook');
+        if (!exists) {
+          hasData = true;
+          const row = document.createElement('tr');
+          row.className = 'hover:bg-slate-800/50 transition-colors';
+          row.innerHTML = `
+            <td class="p-4">${data.tarikh || '-'}</td>
+            <td class="p-4"><span class="bg-purple-900/50 text-purple-300 text-xs px-2 py-1 rounded border border-purple-500/30">Buku Log</span></td>
+            <td class="p-4 text-sm truncate max-w-xs">${data.tujuan || '-'}</td>
+            <td class="p-4 text-emerald-400 font-bold">RM ${data.kos || '0'}</td>
+            <td class="p-4 text-slate-500 text-xs">Simpanan Tempatan</td>
+          `;
+          tbody.prepend(row);
+        }
+      });
+      
+      // Kira jumlah kos dari metadata
+      if (metadataData.length > 0) {
+        const total = metadataData.reduce((sum, item) => sum + (parseFloat(item.kos) || 0), 0);
         document.getElementById('vlTotalKos').innerText = "RM " + total.toFixed(2);
       }
     }
@@ -1128,6 +1157,17 @@
             data_harian: dataHarian,
             saved_at: new Date().toISOString()
           });
+          
+          // Simpan ke metadata juga
+          saveToLocalStorage('records_metadata', {
+            record_type: 'wfb',
+            tarikh: tcBulan + '-01',
+            jenis_data: 'Kad Waktu',
+            butiran: 'Rekod Kad Waktu Bulanan',
+            kos: 0,
+            saved_at: new Date().toISOString()
+          });
+          
           alert("Ralat Supabase: " + error.message + "\nData disimpan secara tempatan (localStorage).");
           btn.innerHTML = originalHtml;
           btn.classList.remove('bg-emerald-400');
@@ -1142,6 +1182,16 @@
           bahagian: document.getElementById('tcBahagian').value,
           bulan: tcBulan,
           data_harian: dataHarian,
+          saved_at: new Date().toISOString()
+        });
+        
+        // Simpan ke metadata juga
+        saveToLocalStorage('records_metadata', {
+          record_type: 'wfb',
+          tarikh: tcBulan + '-01',
+          jenis_data: 'Kad Waktu',
+          butiran: 'Rekod Kad Waktu Bulanan',
+          kos: 0,
           saved_at: new Date().toISOString()
         });
       }
@@ -1306,6 +1356,17 @@
             nota: dataObj.nota,
             saved_at: new Date().toISOString()
           });
+          
+          // Simpan ke metadata juga
+          saveToLocalStorage('records_metadata', {
+            record_type: 'logbook',
+            tarikh: dataObj.tarikh !== '-' ? dataObj.tarikh : null,
+            jenis_data: 'Buku Log',
+            butiran: dataObj.tujuan,
+            kos: dataObj.kos ? parseFloat(dataObj.kos) : 0,
+            saved_at: new Date().toISOString()
+          });
+          
           alert("Ralat Supabase: " + error.message + "\nData disimpan secara tempatan (localStorage).");
           return;
         }
@@ -1330,6 +1391,16 @@
           liter: dataObj.liter ? parseFloat(dataObj.liter) : null,
           pelulus: dataObj.pelulus,
           nota: dataObj.nota,
+          saved_at: new Date().toISOString()
+        });
+        
+        // Simpan ke metadata juga
+        saveToLocalStorage('records_metadata', {
+          record_type: 'logbook',
+          tarikh: dataObj.tarikh !== '-' ? dataObj.tarikh : null,
+          jenis_data: 'Buku Log',
+          butiran: dataObj.tujuan,
+          kos: dataObj.kos ? parseFloat(dataObj.kos) : 0,
           saved_at: new Date().toISOString()
         });
       }
