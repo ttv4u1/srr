@@ -1,309 +1,953 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem WFB & Log Perjalanan Premium Malaysia v3.1.3</title>
-    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg">
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)), 
-                        url('https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg');
-            background-size: 50%; background-repeat: no-repeat; background-position: center;
-            background-attachment: fixed; color: #ffffff;
-        }
-        .glass-panel { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 16px; }
-        .input-premium { background: rgba(255, 255, 255, 0.95); color: #1a1a1a; border-radius: 8px; padding: 10px 14px; width: 100%; border: none; font-weight: 600; }
-        .red-alert { background: #ff4d4d !important; color: white !important; animation: blink 1.5s infinite; }
-        @keyframes blink { 50% { opacity: 0.7; } }
-        .btn-realistic { transition: all 0.2s; box-shadow: 0 4px 0 rgba(0,0,0,0.4); cursor: pointer; }
-        .btn-realistic:active { transform: translateY(2px); box-shadow: none; }
-        #auth-overlay { position: fixed; inset: 0; background: #0b0e14; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        .hidden { display: none !important; }
-        input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0); }
-    </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="description" content="Sistem Premium Kad Mencatat Waktu WFB & Buku Log Kerajaan Malaysia - Versi 10.0 Ultimate">
+<title>Sistem WFB & Buku Log Kerajaan Malaysia v10.1 Ultimate Pro</title>
+<link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg">
+<link rel="shortcut icon" href="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg">
+<style>
+:root{
+  --gold:#D4AF37; --gold-light:#F4D03F; --gold-dark:#9A7B0A;
+  --royal:#8B0000; --royal-light:#B22222; --royal-dark:#5C0000;
+  --cream:#FFF8DC; --ink:#1a1a1a; --paper:#FFFEF7;
+  --green:#0F5132; --red:#DC2626; --blue:#1E40AF;
+  --shadow-lux: 0 10px 40px rgba(139,0,0,.25), 0 2px 8px rgba(0,0,0,.15);
+  --shadow-3d: 0 4px 0 rgba(0,0,0,.2), 0 6px 20px rgba(0,0,0,.3);
+  --grad-gold: linear-gradient(135deg,#FFD700 0%,#D4AF37 35%,#9A7B0A 70%,#D4AF37 100%);
+  --grad-royal: linear-gradient(135deg,#B22222 0%,#8B0000 50%,#5C0000 100%);
+  --grad-emerald: linear-gradient(135deg,#10B981,#047857);
+  --grad-sapphire: linear-gradient(135deg,#3B82F6,#1E3A8A);
+  --grad-ruby: linear-gradient(135deg,#EF4444,#991B1B);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;
+  color:var(--ink);
+  min-height:100vh;
+  background:
+    linear-gradient(rgba(255,253,240,.86),rgba(255,248,220,.90)),
+    url("https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg") center center / contain no-repeat,
+    linear-gradient(135deg,#FFF8DC,#E8D9A8);
+  background-attachment:fixed,fixed,fixed;
+}
+/* HEADER */
+.topbar{
+  background:var(--grad-royal);
+  color:#fff;
+  padding:6px 16px;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:13px;
+  border-bottom:3px solid var(--gold);
+  flex-wrap:wrap;gap:8px;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 4px 12px rgba(0,0,0,.3);
+}
+.topbar .clock{font-weight:600;letter-spacing:.5px}
+.lang-switch button{
+  background:var(--grad-gold);border:1px solid var(--gold-dark);
+  color:var(--royal-dark);padding:4px 12px;border-radius:20px;
+  cursor:pointer;font-weight:700;margin-left:6px;font-size:12px;
+  box-shadow:0 2px 4px rgba(0,0,0,.2);
+  transition:transform .15s;
+}
+.lang-switch button:hover{transform:translateY(-1px)}
+.lang-switch button.active{background:#fff;color:var(--royal)}
+
+header.hero{
+  background:linear-gradient(135deg,rgba(139,0,0,.95),rgba(92,0,0,.95));
+  color:#fff;
+  padding:20px 16px;
+  text-align:center;
+  border-bottom:4px solid var(--gold);
+  position:relative;overflow:hidden;
+}
+header.hero::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='100' r='80' fill='none' stroke='%23FFD700' stroke-width='1' opacity='.15'/></svg>");
+  background-size:200px;opacity:.3;
+}
+.logos{display:flex;justify-content:center;align-items:center;gap:24px;flex-wrap:wrap;position:relative;z-index:1}
+.logo{
+  width:80px;height:80px;border-radius:50%;
+  background:var(--grad-gold);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:bold;text-align:center;color:var(--royal-dark);
+  box-shadow:0 4px 16px rgba(0,0,0,.4),inset 0 2px 4px rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.3);
+  border:3px solid #fff;
+  padding:4px;line-height:1.1;
+  transition:transform .3s;
+}
+.logo:hover{transform:rotate(360deg) scale(1.1)}
+.logo svg,.logo img{width:100%;height:100%;object-fit:contain;border-radius:50%;display:block}
+h1.title{
+  font-size:clamp(18px,3.5vw,28px);
+  margin-top:14px;
+  text-shadow:2px 2px 4px rgba(0,0,0,.5);
+  font-weight:800;letter-spacing:1px;
+  position:relative;z-index:1;
+}
+.subtitle{font-size:13px;opacity:.9;margin-top:4px;position:relative;z-index:1}
+.version-badge{
+  display:inline-block;background:var(--grad-gold);color:var(--royal-dark);
+  padding:4px 14px;border-radius:20px;font-size:11px;font-weight:bold;
+  margin-top:8px;box-shadow:0 2px 6px rgba(0,0,0,.3);
+  position:relative;z-index:1;
+}
+
+/* NAV TABS */
+nav.tabs{
+  display:flex;flex-wrap:wrap;gap:6px;
+  padding:12px;
+  background:linear-gradient(180deg,rgba(255,248,220,.95),rgba(244,208,63,.4));
+  border-bottom:2px solid var(--gold-dark);
+  justify-content:center;
+  position:sticky;top:33px;z-index:99;
+  backdrop-filter:blur(8px);
+}
+.tab-btn{
+  padding:10px 18px;border:none;cursor:pointer;
+  background:var(--grad-gold);color:var(--royal-dark);
+  border-radius:8px;font-weight:700;font-size:13px;
+  box-shadow:var(--shadow-3d);
+  transition:all .2s;
+  border:1px solid var(--gold-dark);
+  display:flex;align-items:center;gap:6px;
+}
+.tab-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.3)}
+.tab-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.2)}
+.tab-btn.active{background:var(--grad-royal);color:#fff;border-color:var(--gold)}
+
+/* SECTIONS */
+main{padding:16px;max-width:1600px;margin:0 auto}
+.section{display:none;animation:fadeIn .4s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.card{
+  background:var(--paper);
+  border:2px solid var(--gold);
+  border-radius:14px;
+  padding:18px;margin-bottom:18px;
+  box-shadow:var(--shadow-lux);
+  position:relative;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:4px;
+  background:var(--grad-gold);border-radius:14px 14px 0 0;
+}
+.card h2{
+  color:var(--royal);font-size:18px;margin-bottom:14px;
+  padding-bottom:8px;border-bottom:2px dashed var(--gold);
+  display:flex;align-items:center;gap:8px;
+}
+.card h3{color:var(--royal-dark);font-size:15px;margin:12px 0 8px}
+
+/* FORMS */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12px;font-weight:700;color:var(--royal-dark);text-transform:uppercase;letter-spacing:.5px}
+.field input,.field select,.field textarea{
+  padding:10px 12px;border:2px solid var(--gold-light);
+  border-radius:8px;font-size:14px;
+  background:#fff;
+  transition:all .2s;
+  font-family:inherit;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none;border-color:var(--royal);
+  box-shadow:0 0 0 3px rgba(139,0,0,.15);
+}
+.field input.late{background:#FEE2E2;border-color:var(--red);color:var(--red);font-weight:bold}
+.field input.ot{background:#DBEAFE;border-color:var(--blue);color:var(--blue);font-weight:bold}
+
+/* BUTTONS */
+.btn{
+  padding:10px 18px;border:none;border-radius:8px;cursor:pointer;
+  font-weight:700;font-size:13px;
+  display:inline-flex;align-items:center;gap:6px;
+  transition:all .15s;
+  box-shadow:var(--shadow-3d);
+  color:#fff;
+  text-transform:uppercase;letter-spacing:.5px;
+  margin:4px 4px 4px 0;
+}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.1)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.2)}
+.btn-gold{background:var(--grad-gold);color:var(--royal-dark)}
+.btn-royal{background:var(--grad-royal)}
+.btn-emerald{background:var(--grad-emerald)}
+.btn-sapphire{background:var(--grad-sapphire)}
+.btn-ruby{background:var(--grad-ruby)}
+.btn-sm{padding:6px 10px;font-size:11px}
+
+/* TABLES */
+.table-wrap{overflow-x:auto;border:2px solid var(--gold-dark);border-radius:10px;background:#fff}
+table{width:100%;border-collapse:collapse;min-width:700px;font-size:12px}
+table th{
+  background:var(--grad-royal);color:#fff;
+  padding:10px 6px;text-align:center;font-size:11px;
+  border:1px solid var(--gold-dark);
+  text-transform:uppercase;letter-spacing:.3px;
+}
+table td{padding:6px;border:1px solid #ddd;text-align:center}
+table tbody tr:nth-child(even){background:#FFF8DC}
+table tbody tr:hover{background:#FFE4B5}
+table input{
+  width:100%;border:1px solid transparent;padding:4px;font-size:12px;
+  background:transparent;border-radius:4px;
+}
+table input:focus{outline:none;border-color:var(--royal);background:#fff}
+table input.late{background:#FEE2E2;color:var(--red);font-weight:bold}
+table input.ot{background:#DBEAFE;color:var(--blue);font-weight:bold}
+
+/* TWO-PAGE LAYOUT */
+.two-pages{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:1100px){.two-pages{grid-template-columns:1fr 1fr}}
+.page-card{background:#fff;border:2px solid var(--royal);border-radius:10px;overflow:hidden}
+.page-header{background:var(--grad-royal);color:#fff;padding:8px;text-align:center;font-weight:bold;font-size:13px}
+
+/* UPLOAD */
+.upload-zone{
+  border:3px dashed var(--gold);border-radius:12px;
+  padding:30px;text-align:center;
+  background:linear-gradient(135deg,rgba(255,248,220,.5),rgba(244,208,63,.2));
+  cursor:pointer;transition:all .2s;
+}
+.upload-zone:hover{border-color:var(--royal);background:rgba(244,208,63,.4)}
+.upload-zone input{display:none}
+.upload-icon{font-size:42px;margin-bottom:8px}
+
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:14px}
+.gallery-item{
+  position:relative;border:2px solid var(--gold);border-radius:8px;
+  overflow:hidden;background:#fff;aspect-ratio:1;
+}
+.gallery-item img{width:100%;height:100%;object-fit:cover}
+.gallery-item .label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.7);color:#fff;padding:4px;font-size:10px;text-align:center}
+.gallery-item .del{position:absolute;top:4px;right:4px;background:var(--red);color:#fff;border:none;width:24px;height:24px;border-radius:50%;cursor:pointer;font-weight:bold}
+
+/* SUMMARY */
+.summary-box{
+  background:var(--grad-gold);color:var(--royal-dark);
+  padding:14px;border-radius:10px;margin-top:12px;
+  font-weight:bold;font-size:18px;text-align:center;
+  border:2px solid var(--royal);box-shadow:var(--shadow-3d);
+}
+
+/* PROFILE FAB */
+.profile-fab{
+  position:fixed;bottom:20px;right:20px;z-index:90;
+  background:var(--grad-royal);color:#fff;
+  width:56px;height:56px;border-radius:50%;border:3px solid var(--gold);
+  cursor:pointer;font-size:24px;
+  box-shadow:0 6px 20px rgba(0,0,0,.4);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .3s;
+}
+.profile-fab:hover{transform:scale(1.1) rotate(15deg)}
+.profile-panel{
+  position:fixed;bottom:88px;right:20px;z-index:90;
+  background:var(--paper);border:2px solid var(--gold);border-radius:14px;
+  padding:16px;width:280px;display:none;
+  box-shadow:var(--shadow-lux);
+}
+.profile-panel.show{display:block;animation:fadeIn .3s}
+
+/* PRINT */
+@media print{
+  .topbar,nav.tabs,.profile-fab,.profile-panel,.no-print,.btn,.upload-zone{display:none!important}
+  .section{display:block!important;page-break-after:always}
+  body{background:#fff!important}
+  .card{box-shadow:none;border:1px solid #000}
+}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  h1.title{font-size:16px}
+  .logo{width:60px;height:60px;font-size:9px}
+  .tab-btn{padding:8px 12px;font-size:11px}
+  .btn{padding:8px 12px;font-size:11px}
+}
+
+/* FOOTER */
+footer{
+  background:var(--grad-royal);color:#fff;text-align:center;
+  padding:16px;margin-top:30px;border-top:4px solid var(--gold);
+  font-size:12px;
+}
+</style>
 </head>
-<body class="p-2 md:p-6">
+<body>
 
-    <!-- LOGIN OVERLAY -->
-    <div id="auth-overlay">
-        <div class="glass-panel p-10 text-center max-w-md w-full mx-4 border-yellow-500/50">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" class="h-28 mx-auto mb-6">
-            <h1 class="text-2xl font-black mb-2 text-yellow-500 tracking-tighter">LOG MASUK KORPORAT</h1>
-            <p class="text-gray-400 mb-8 text-sm uppercase tracking-widest font-semibold">Sistem Rekod Digital v3.1.3</p>
-            
-            <button id="loginBtn" onclick="loginGoogle()" class="bg-white text-black px-6 py-4 rounded-xl font-bold flex items-center justify-center gap-3 w-full hover:bg-gray-200 transition btn-realistic">
-                <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="h-6">
-                Log Masuk dengan Google
-            </button>
-            <p id="auth-status" class="mt-4 text-xs text-blue-400 hidden italic">Menghubungi pelayan...</p>
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="clock" id="liveClock">--:--:--</div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <div id="authBox" style="display:flex;align-items:center;gap:8px;font-size:12px;color:#fff">
+      <span id="authStatus" style="opacity:.85">⏳ Memuatkan…</span>
+      <button id="btnLogin" class="btn btn-gold btn-sm" style="display:none" onclick="loginGoogle()">🔐 Log Masuk Google</button>
+      <button id="btnLogout" class="btn btn-ruby btn-sm" style="display:none" onclick="logout()">🚪 Keluar</button>
+      <button id="btnSync" class="btn btn-emerald btn-sm" style="display:none" onclick="syncFromCloud()">☁️ Segarkan</button>
+    </div>
+    <div class="lang-switch">
+      <button class="active" data-lang="ms" onclick="setLang('ms')">🇲🇾 BM</button>
+      <button data-lang="en" onclick="setLang('en')">🇺🇸 EN</button>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="logos">
+    <div class="logo" title="Jata Negara Malaysia">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" alt="Jata Negara Malaysia" loading="lazy">
+    </div>
+    <div class="logo" title="Logo Jabatan (DVS)">
+      <img src="https://github.com/ttv4u1/KP/raw/main/DVS.svg" alt="Logo Jabatan DVS" loading="lazy">
+    </div>
+    <div class="logo" title="Logo Penguatkuasaan">
+      <img src="https://github.com/ttv4u1/KP/raw/main/Logo%20Penguatkuasa.png" alt="Logo Penguatkuasaan" loading="lazy">
+    </div>
+  </div>
+  <h1 class="title" data-i18n="appTitle">SISTEM KAD MENCATAT WAKTU WFB & BUKU LOG KENDERAAN KERAJAAN</h1>
+  <div class="subtitle" data-i18n="subtitle">Kerajaan Malaysia • Edisi Korporat Mewah Premium • v11.0 • ☁️ Cloud Sync</div>
+  <div class="version-badge">⭐ VERSION 11.0 ULTIMATE PRO • GOOGLE LOGIN + SUPABASE CLOUD ⭐</div>
+</header>
+
+<!-- TABS -->
+<nav class="tabs">
+  <button class="tab-btn active" onclick="showTab('kad')">🕐 <span data-i18n="tabKad">KAD WAKTU</span></button>
+  <button class="tab-btn" onclick="showTab('log')">🚗 <span data-i18n="tabLog">BUKU LOG</span></button>
+  <button class="tab-btn" onclick="showTab('upload')">📸 <span data-i18n="tabUpload">MUAT NAIK</span></button>
+  <button class="tab-btn" onclick="showTab('data')">📊 <span data-i18n="tabData">SEMUA DATA</span></button>
+  <button class="tab-btn" onclick="showTab('export')">💾 <span data-i18n="tabExport">EKSPORT</span></button>
+</nav>
+
+<main>
+
+<!-- ========== TAB 1: KAD WAKTU ========== -->
+<section id="kad" class="section active">
+  <div class="card">
+    <h2>🕐 <span data-i18n="kadTitle">KAD MENCATAT WAKTU WFB</span></h2>
+    <p style="font-size:12px;color:#666;margin-bottom:10px">
+      <span data-i18n="wfbInfo">⏰ WFB: 7:30 PG - 4:30 PTG | Maks: 9:00 PG - 6:00 PTG | Lewat selepas 9:00 PG = MERAH | Sebelum 7:00 PG / Selepas WFB = OT</span>
+    </p>
+
+    <div class="two-pages">
+      <!-- PAGE 1 -->
+      <div class="page-card">
+        <div class="page-header" data-i18n="muka1">MUKA 1 — A No. (Bil. 1-15)</div>
+        <div style="padding:10px">
+          <div class="grid">
+            <div class="field"><label data-i18n="aNo">A No.</label><input type="text" id="aNo" oninput="document.getElementById('bNo').value=this.value"></div>
+            <div class="field"><label>Nama</label><input type="text" id="nama1"></div>
+            <div class="field"><label>Kem./Jab.</label><input type="text" id="kem1"></div>
+            <div class="field"><label>Bahagian/Seksyen</label><input type="text" id="bhg1"></div>
+            <div class="field"><label>Bulan</label><input type="month" id="bln1" value=""></div>
+          </div>
+          <div class="table-wrap" style="margin-top:10px">
+            <table id="tbl1">
+              <thead><tr><th>Bil</th><th>Tarikh</th><th>Masuk</th><th>Keluar</th><th>Masuk</th><th>Keluar</th><th>Kenyataan</th><th>T/T</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </div>
+      </div>
+
+      <!-- PAGE 2 -->
+      <div class="page-card">
+        <div class="page-header" data-i18n="muka2">MUKA 2 — B No. (Bil. 16-31)</div>
+        <div style="padding:10px">
+          <div class="grid">
+            <div class="field"><label>B No.</label><input type="text" id="bNo" readonly style="background:#F4D03F"></div>
+            <div class="field"><label>Nama</label><input type="text" id="nama2"></div>
+            <div class="field"><label>Kem./Jab.</label><input type="text" id="kem2"></div>
+            <div class="field"><label>Bahagian/Seksyen</label><input type="text" id="bhg2"></div>
+            <div class="field"><label>Bulan</label><input type="month" id="bln2"></div>
+          </div>
+          <div class="table-wrap" style="margin-top:10px">
+            <table id="tbl2">
+              <thead><tr><th>Bil</th><th>Tarikh</th><th>Masuk</th><th>Keluar</th><th>Masuk</th><th>Keluar</th><th>Kenyataan</th><th>T/T</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- MAIN APP -->
-    <div id="main-app" class="hidden max-w-7xl mx-auto">
-        <header class="glass-panel p-6 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-4">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" class="h-16 md:h-20">
-                <div>
-                    <h1 class="text-xl md:text-3xl font-black text-yellow-400 uppercase leading-none">Sistem Data Premium</h1>
-                    <p id="clock" class="text-xs font-mono text-gray-300 mt-2 bg-black/30 p-1 rounded inline-block"></p>
-                </div>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="text-right">
-                    <p id="user-email" class="text-sm font-bold text-blue-400"></p>
-                    <button onclick="logout()" class="text-[10px] bg-red-600/20 text-red-400 px-2 py-1 rounded hover:bg-red-600 hover:text-white transition">LOG KELUAR</button>
-                </div>
-                <div id="user-avatar" class="h-12 w-12 rounded-full border-2 border-yellow-500 bg-gray-700 overflow-hidden shadow-lg shadow-yellow-500/20"></div>
-            </div>
-        </header>
+    <div style="margin-top:14px;text-align:center">
+      <button class="btn btn-emerald" onclick="saveKad()">💾 Simpan Kad</button>
+      <button class="btn btn-sapphire" onclick="window.print()">🖨️ Cetak</button>
+      <button class="btn btn-gold" onclick="autoFillToday()">⚡ Auto Isi Hari Ini</button>
+      <button class="btn btn-ruby" onclick="clearKad()">🗑️ Kosongkan</button>
+    </div>
+  </div>
+</section>
 
-        <!-- PROFILE SECTION -->
-        <section class="glass-panel p-6 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div><label class="text-[10px] text-yellow-500 font-bold block mb-1 uppercase">Nama Pegawai</label><input type="text" id="p_nama" class="input-premium"></div>
-                <div><label class="text-[10px] text-yellow-500 font-bold block mb-1 uppercase">Kem./Jabatan</label><input type="text" id="p_jab" class="input-premium"></div>
-                <div><label class="text-[10px] text-yellow-500 font-bold block mb-1 uppercase">Bahagian</label><input type="text" id="p_bah" class="input-premium"></div>
-                <div><label class="text-[10px] text-yellow-500 font-bold block mb-1 uppercase">Bulan Rekod</label><input type="month" id="p_bulan" class="input-premium"></div>
-            </div>
-        </section>
-
-        <!-- TABLES -->
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
-            <div class="glass-panel p-4 overflow-x-auto border-t-4 border-blue-500">
-                <h3 class="font-bold text-blue-400 mb-3 flex items-center gap-2"><i class="fas fa-calendar-alt"></i> JADUAL KEHADIRAN (1-15hb)</h3>
-                <table class="w-full text-[11px]" id="table-wfb-a">
-                    <thead><tr class="bg-blue-900/50 text-left"><th class="p-2">TARIKH</th><th class="p-2">MASUK</th><th class="p-2">KELUAR</th><th class="p-2">MASUK</th><th class="p-2">KELUAR</th><th class="p-2">NOTA</th></tr></thead>
-                    <tbody id="wfb-a-body"></tbody>
-                </table>
-            </div>
-            <div class="glass-panel p-4 overflow-x-auto border-t-4 border-green-500">
-                <h3 class="font-bold text-green-400 mb-3 flex items-center gap-2"><i class="fas fa-calendar-check"></i> JADUAL KEHADIRAN (16-31hb)</h3>
-                <table class="w-full text-[11px]" id="table-wfb-b">
-                    <thead><tr class="bg-green-900/50 text-left"><th class="p-2">TARIKH</th><th class="p-2">MASUK</th><th class="p-2">KELUAR</th><th class="p-2">MASUK</th><th class="p-2">KELUAR</th><th class="p-2">NOTA</th></tr></thead>
-                    <tbody id="wfb-b-body"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- LOG KENDERAAN -->
-        <section class="glass-panel p-6 mb-6 border-t-4 border-yellow-500">
-            <h2 class="font-bold text-yellow-500 mb-5 flex items-center gap-2 text-lg"><i class="fas fa-car-side"></i> LOG PERJALANAN KENDERAAN</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                <div><label class="text-[10px] text-gray-400 font-bold">NO. PLAT</label><input type="text" id="v_plat" class="input-premium"></div>
-                <div><label class="text-[10px] text-gray-400 font-bold">MODEL</label><input type="text" id="v_model" class="input-premium"></div>
-                <div><label class="text-[10px] text-gray-400 font-bold">ODO MULA</label><input type="number" id="v_odo" class="input-premium" oninput="recalcLogs()"></div>
-                <div class="flex items-end"><button onclick="addLogRow()" class="bg-blue-600 hover:bg-blue-500 w-full py-2.5 rounded-lg font-bold text-xs btn-realistic">+ BARIS BARU</button></div>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-[11px] min-w-[900px]">
-                    <thead class="bg-gray-800">
-                        <tr><th class="p-3">TARIKH</th><th class="p-3">MASA</th><th class="p-3">PEMANDU</th><th class="p-3">DESTINASI/TUJUAN</th><th class="p-3">ODO AKHIR</th><th class="p-3">JARAK</th><th class="p-3">KOS (RM)</th><th class="p-3">LITER</th></tr>
-                    </thead>
-                    <tbody id="log-body"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- ACTION BUTTONS -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-20">
-            <button onclick="syncToCloud()" id="btnSync" class="bg-emerald-600 hover:bg-emerald-500 py-5 rounded-2xl font-black text-lg btn-realistic flex items-center justify-center gap-3">
-                <i class="fas fa-cloud-upload-alt text-2xl"></i> SIMPAN KE CLOUD
-            </button>
-            <button onclick="window.print()" class="bg-gray-700 hover:bg-gray-600 py-5 rounded-2xl font-black text-lg btn-realistic flex items-center justify-center gap-3">
-                <i class="fas fa-print text-2xl"></i> CETAK / PDF
-            </button>
-            <button onclick="exportCSV()" class="bg-blue-700 hover:bg-blue-600 py-5 rounded-2xl font-black text-lg btn-realistic flex items-center justify-center gap-3">
-                <i class="fas fa-file-csv text-2xl"></i> EXPORT EXCEL
-            </button>
-        </div>
+<!-- ========== TAB 2: BUKU LOG ========== -->
+<section id="log" class="section">
+  <div class="card">
+    <h2>🚗 <span data-i18n="logTitle">BUKU LOG KENDERAAN KERAJAAN</span></h2>
+    <div class="grid">
+      <div class="field"><label>Bulan Rekod</label><input type="month" id="logBulan"></div>
+      <div class="field"><label>No. Pendaftaran</label><input type="text" id="logNoReg" placeholder="WXX 1234"></div>
+      <div class="field"><label>Model Kereta</label><input type="text" id="logModel" placeholder="Proton X70"></div>
+      <div class="field"><label>Odo Permulaan (KM)</label><input type="number" id="logOdoStart" oninput="recalcLog()"></div>
+      <div class="field"><label>Bahagian/Unit</label><input type="text" id="logUnit"></div>
+      <div class="field"><label>Pemandu Tetap</label><input type="text" id="logPemandu"></div>
     </div>
 
-    <script>
-        // --- KONFIGURASI SUPABASE ---
-        const SB_URL = "https://cakjtqnmqobatznznhydt.supabase.co"; 
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNha2p0cXdub2JxenR6bnpoZHl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NjQ2NzQsImV4cCI6MjA5MzE0MDY3NH0.FGiOLDprt-cA_VM32YraV7FqaRpw90pxVljorz_bdoo";
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+    <h3 style="margin-top:14px">📋 Rekod Perjalanan</h3>
+    <div class="table-wrap">
+      <table id="tblLog">
+        <thead><tr>
+          <th>Bil</th><th>Tarikh</th>
+          <th>Masa Pergi</th><th>Masa Balik</th>
+          <th>Pemandu</th><th>Tujuan & Lokasi Penuh</th>
+          <th>Pelulus</th><th>Pengguna</th>
+          <th>Odo Akhir</th><th>Jarak (KM)</th>
+          <th>Kos & Resit (RM)</th><th>Liter</th><th>Nota</th>
+          <th class="no-print">Aksi</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
 
-        let currentUser = null;
+    <div style="margin-top:10px">
+      <button class="btn btn-gold" onclick="addLogRow()">➕ Tambah Baris</button>
+      <button class="btn btn-emerald" onclick="saveLog()">💾 Simpan Log</button>
+      <button class="btn btn-sapphire" onclick="window.print()">🖨️ Cetak</button>
+      <button class="btn btn-ruby" onclick="clearLog()">🗑️ Kosongkan</button>
+    </div>
 
-        // --- AUTH ENGINE ---
-        async function checkSession() {
-            const { data: { session } } = await supabase.auth.getSession();
-            handleAuth(session);
+    <div class="summary-box">
+      💰 <span data-i18n="totalCost">JUMLAH KESELURUHAN KOS BAHAN API:</span>
+      RM <span id="totalKos">0.00</span>
+      &nbsp;|&nbsp; 📏 Jumlah KM: <span id="totalKm">0</span>
+      &nbsp;|&nbsp; ⛽ Jumlah Liter: <span id="totalLiter">0.00</span>
+    </div>
+  </div>
+</section>
 
-            supabase.auth.onAuthStateChange((event, session) => {
-                console.log("Auth Event:", event);
-                handleAuth(session);
-            });
-        }
+<!-- ========== TAB 3: UPLOAD ========== -->
+<section id="upload" class="section">
+  <div class="card">
+    <h2>📸 <span data-i18n="uploadTitle">MUAT NAIK BUKTI & RESIT</span></h2>
 
-        function handleAuth(session) {
-            if (session) {
-                currentUser = session.user;
-                document.getElementById('auth-overlay').classList.add('hidden');
-                document.getElementById('main-app').classList.remove('hidden');
-                document.getElementById('user-email').innerText = currentUser.email;
-                if(currentUser.user_metadata.avatar_url) {
-                    document.getElementById('user-avatar').innerHTML = `<img src="${currentUser.user_metadata.avatar_url}">`;
-                }
-                loadUserData();
-            } else {
-                document.getElementById('auth-overlay').classList.remove('hidden');
-                document.getElementById('main-app').classList.add('hidden');
-            }
-        }
+    <h3>⛽ Resit Minyak</h3>
+    <label class="upload-zone" for="upMinyak">
+      <div class="upload-icon">⛽</div>
+      <div><strong data-i18n="clickUp">Klik untuk muat naik</strong> atau seret fail di sini</div>
+      <input type="file" id="upMinyak" accept="image/*" multiple onchange="handleUpload(event,'minyak')">
+    </label>
+    <div class="gallery" id="galMinyak"></div>
 
-        async function loginGoogle() {
-            document.getElementById('auth-status').classList.remove('hidden');
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: { 
-                    redirectTo: window.location.origin + window.location.pathname 
-                }
-            });
-            if (error) {
-                alert("Ralat Login: " + error.message);
-                document.getElementById('auth-status').classList.add('hidden');
-            }
-        }
+    <h3 style="margin-top:18px">💳 Resit TNG (Touch 'n Go)</h3>
+    <label class="upload-zone" for="upTng">
+      <div class="upload-icon">💳</div>
+      <div><strong>Klik untuk muat naik</strong> resit TNG</div>
+      <input type="file" id="upTng" accept="image/*" multiple onchange="handleUpload(event,'tng')">
+    </label>
+    <div class="gallery" id="galTng"></div>
 
-        async function logout() {
-            if(confirm("Log keluar sekarang?")) {
-                await supabase.auth.signOut();
-                location.reload();
-            }
-        }
+    <h3 style="margin-top:18px">🚙 Gambar Odometer</h3>
+    <label class="upload-zone" for="upOdo">
+      <div class="upload-icon">🚙</div>
+      <div><strong>Klik untuk muat naik</strong> gambar odometer</div>
+      <input type="file" id="upOdo" accept="image/*" multiple onchange="handleUpload(event,'odo')">
+    </label>
+    <div class="gallery" id="galOdo"></div>
+  </div>
+</section>
 
-        // --- UI LOGIC ---
-        function initTables() {
-            const bodyA = document.getElementById('wfb-a-body');
-            const bodyB = document.getElementById('wfb-b-body');
-            bodyA.innerHTML = ''; bodyB.innerHTML = '';
-            for(let i=1; i<=15; i++) bodyA.innerHTML += createWfbRow();
-            for(let i=16; i<=31; i++) bodyB.innerHTML += createWfbRow();
-            for(let i=0; i<3; i++) addLogRow();
-        }
+<!-- ========== TAB 4: DATA ========== -->
+<section id="data" class="section">
+  <div class="card">
+    <h2>📊 <span data-i18n="dataTitle">SEMUA DATA TERSIMPAN</span></h2>
 
-        function createWfbRow() {
-            return `<tr class="border-b border-white/5">
-                <td class="p-1"><input type="date" class="bg-transparent w-full outline-none text-white"></td>
-                <td class="p-1"><input type="time" class="bg-transparent w-full outline-none text-white" onchange="checkTime(this)"></td>
-                <td class="p-1"><input type="time" class="bg-transparent w-full outline-none text-white"></td>
-                <td class="p-1"><input type="time" class="bg-transparent w-full outline-none text-white"></td>
-                <td class="p-1"><input type="time" class="bg-transparent w-full outline-none text-white"></td>
-                <td class="p-1"><input type="text" class="bg-transparent w-full outline-none text-[10px]" placeholder="..."></td>
-            </tr>`;
-        }
+    <h3>🕐 Rekod Kad Waktu</h3>
+    <div class="table-wrap"><table id="viewKad"><thead><tr><th>A/B No</th><th>Nama</th><th>Bulan</th><th>Bil. Hari</th><th>Lewat</th><th>OT</th><th>Aksi</th></tr></thead><tbody></tbody></table></div>
 
-        function checkTime(el) {
-            if(!el.value) return;
-            const hour = parseInt(el.value.split(':')[0]);
-            const min = parseInt(el.value.split(':')[1]);
-            // Contoh Merah: Jika masuk selepas 9:00 AM
-            if(hour > 9 || (hour === 9 && min > 0)) el.parentElement.classList.add('red-alert');
-            else el.parentElement.classList.remove('red-alert');
-        }
+    <h3 style="margin-top:14px">🚗 Rekod Buku Log</h3>
+    <div class="table-wrap"><table id="viewLog"><thead><tr><th>Bulan</th><th>No. Reg</th><th>Model</th><th>Bil. Trip</th><th>Total KM</th><th>Total RM</th><th>Aksi</th></tr></thead><tbody></tbody></table></div>
 
-        function addLogRow() {
-            const html = `<tr class="border-b border-white/5">
-                <td class="p-2"><input type="date" class="bg-transparent w-full outline-none"></td>
-                <td class="p-2"><input type="text" placeholder="08:00 AM" class="bg-transparent w-full outline-none"></td>
-                <td class="p-2"><input type="text" class="bg-transparent w-full outline-none"></td>
-                <td class="p-2"><input type="text" class="bg-transparent w-full outline-none"></td>
-                <td class="p-2"><input type="number" class="bg-transparent w-full outline-none odo-end font-bold text-yellow-400" oninput="recalcLogs()"></td>
-                <td class="p-2"><input type="text" readonly class="bg-transparent w-full outline-none text-gray-500 font-bold row-jarak"></td>
-                <td class="p-2"><input type="number" step="0.01" class="bg-transparent w-full outline-none"></td>
-                <td class="p-2"><input type="number" step="0.01" class="bg-transparent w-full outline-none"></td>
-            </tr>`;
-            document.getElementById('log-body').insertAdjacentHTML('beforeend', html);
-        }
+    <h3 style="margin-top:14px">📸 Semua Gambar Dimuat Naik</h3>
+    <div class="gallery" id="viewAllPics"></div>
 
-        function recalcLogs() {
-            let startOdo = parseFloat(document.getElementById('v_odo').value) || 0;
-            const rows = document.querySelectorAll('#log-body tr');
-            rows.forEach((row, i) => {
-                let endOdo = parseFloat(row.querySelector('.odo-end').value) || 0;
-                let fieldJarak = row.querySelector('.row-jarak');
-                if(endOdo > 0) {
-                    let prevOdo = (i === 0) ? startOdo : parseFloat(rows[i-1].querySelector('.odo-end').value) || startOdo;
-                    fieldJarak.value = (endOdo - prevOdo).toFixed(1) + " KM";
-                }
-            });
-        }
+    <h3 style="margin-top:14px">☁️ Data Cloud (Supabase)</h3>
+    <div id="cloudBox"><p style="padding:14px;color:#666">Klik butang di bawah untuk lihat data dari Supabase.</p></div>
 
-        // --- DATA SYNC ---
-        async function syncToCloud() {
-            if(!currentUser) return;
-            const btn = document.getElementById('btnSync');
-            const originalText = btn.innerHTML;
-            btn.disabled = true; 
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin text-2xl"></i> SEDANG SIMPAN...';
+    <div style="margin-top:14px;text-align:center;display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+      <button class="btn btn-emerald" onclick="viewCloudData()">☁️ Lihat Data Cloud</button>
+      <button class="btn btn-gold" onclick="syncFromCloud()">⬇️ Muat Turun dari Cloud</button>
+      <button class="btn btn-sapphire" onclick="window.print()">🖨️ Cetak Semua</button>
+      <button class="btn btn-ruby" onclick="if(confirm('Padam SEMUA data?'))clearAll()">⚠️ Padam Semua</button>
+    </div>
+  </div>
+</section>
 
-            const payload = {
-                id: currentUser.id,
-                nama: document.getElementById('p_nama').value,
-                jabatan: document.getElementById('p_jab').value,
-                bahagian: document.getElementById('p_bah').value,
-                bulan_rekod: document.getElementById('p_bulan').value,
-                no_plat: document.getElementById('v_plat').value,
-                model_kereta: document.getElementById('v_model').value,
-                odo_permulaan: parseFloat(document.getElementById('v_odo').value) || 0,
-                updated_at: new Date()
-            };
+<!-- ========== TAB 5: EXPORT ========== -->
+<section id="export" class="section">
+  <div class="card">
+    <h2>💾 <span data-i18n="exportTitle">EKSPORT DATA</span></h2>
+    <p style="color:#666;font-size:13px;margin-bottom:14px">Eksport semua data ke pelbagai format. Sokongan untuk Office 365, iOS dan Android.</p>
 
-            const { error } = await supabase.from('profiles').upsert(payload);
+    <div class="grid">
+      <button class="btn btn-emerald" onclick="exportCSV('kad')">📄 CSV Kad Waktu</button>
+      <button class="btn btn-emerald" onclick="exportCSV('log')">📄 CSV Buku Log</button>
+      <button class="btn btn-gold" onclick="exportExcel('kad')">📊 Excel Kad Waktu</button>
+      <button class="btn btn-gold" onclick="exportExcel('log')">📊 Excel Buku Log</button>
+      <button class="btn btn-sapphire" onclick="exportAccess()">🗄️ Access DB (.accdb format)</button>
+      <button class="btn btn-royal" onclick="exportJSON()">💎 JSON Lengkap (Backup)</button>
+      <button class="btn btn-ruby" onclick="document.getElementById('imp').click()">📥 Import JSON Backup</button>
+      <input type="file" id="imp" accept=".json" style="display:none" onchange="importJSON(event)">
+    </div>
 
-            if(error) alert("Ralat Cloud: " + error.message);
-            else alert("✅ Data berjaya dikemaskini ke Cloud!");
-            
-            btn.disabled = false; btn.innerHTML = originalText;
-        }
+    <h3 style="margin-top:18px">🖨️ Cetak Mengikut Bahagian</h3>
+    <div class="grid">
+      <button class="btn btn-sapphire" onclick="printSection('kad')">🖨️ Cetak Kad Waktu</button>
+      <button class="btn btn-sapphire" onclick="printSection('log')">🖨️ Cetak Buku Log</button>
+      <button class="btn btn-sapphire" onclick="printSection('data')">🖨️ Cetak Semua Data</button>
+    </div>
+  </div>
+</section>
 
-        async function loadUserData() {
-            const { data, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-            if (data) {
-                document.getElementById('p_nama').value = data.nama || '';
-                document.getElementById('p_jab').value = data.jabatan || '';
-                document.getElementById('p_bah').value = data.bahagian || '';
-                document.getElementById('p_bulan').value = data.bulan_rekod || '';
-                document.getElementById('v_plat').value = data.no_plat || '';
-                document.getElementById('v_model').value = data.model_kereta || '';
-                document.getElementById('v_odo').value = data.odo_permulaan || 0;
-                recalcLogs();
-            }
-        }
+</main>
 
-        function exportCSV() {
-            let csv = "TARIKH,ODO AKHIR,KOS,LITER\n";
-            document.querySelectorAll('#log-body tr').forEach(row => {
-                const inp = row.querySelectorAll('input');
-                if(inp[0].value) csv += `${inp[0].value},${inp[4].value},${inp[6].value},${inp[7].value}\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `Log_Premium_${document.getElementById('p_nama').value}.csv`;
-            a.click();
-        }
+<!-- PROFILE FAB -->
+<button class="profile-fab" onclick="toggleProfile()" title="Profil">👤</button>
+<div class="profile-panel" id="profilePanel">
+  <h3 style="color:var(--royal);margin-bottom:10px">👤 Profil Pengguna</h3>
+  <div class="field"><label>Nama Penuh</label><input type="text" id="pfNama"></div>
+  <div class="field" style="margin-top:8px"><label>No. Pekerja</label><input type="text" id="pfNoPek"></div>
+  <div class="field" style="margin-top:8px"><label>Jawatan</label><input type="text" id="pfJawatan"></div>
+  <button class="btn btn-emerald btn-sm" style="margin-top:10px;width:100%" onclick="saveProfile()">💾 Simpan Profil</button>
+</div>
 
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleString('ms-MY', { day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true }).toUpperCase();
-        }, 1000);
+<footer>
+  © 2026 Sistem WFB & Buku Log Kerajaan Malaysia • Versi 10.0 Ultimate Pro<br>
+  <small>Bersekutu Bertambah Mutu • Kerajaan Malaysia</small>
+</footer>
 
-        window.onload = () => { 
-            initTables(); 
-            checkSession(); 
-        };
-    </script>
+<script>
+// ============ STATE ============
+const STORE = {
+  get k(){return JSON.parse(localStorage.getItem('wfb_v10')||'{}')},
+  set k(v){localStorage.setItem('wfb_v10',JSON.stringify(v))}
+};
+let DATA = STORE.k;
+DATA.kad = DATA.kad || [];
+DATA.log = DATA.log || [];
+DATA.uploads = DATA.uploads || {minyak:[],tng:[],odo:[]};
+DATA.profile = DATA.profile || {};
+
+// ============ I18N ============
+const I18N = {
+  ms:{appTitle:"SISTEM KAD MENCATAT WAKTU WFB & BUKU LOG KENDERAAN KERAJAAN",subtitle:"Kerajaan Malaysia • Edisi Korporat Mewah Premium • v10.1",tabKad:"KAD WAKTU",tabLog:"BUKU LOG",tabUpload:"MUAT NAIK",tabData:"SEMUA DATA",tabExport:"EKSPORT",kadTitle:"KAD MENCATAT WAKTU WFB",wfbInfo:"⏰ WFB: 7:30 PG - 4:30 PTG | Maks: 9:00 PG - 6:00 PTG | Lewat selepas 9:00 PG = MERAH | Sebelum 7:00 PG / Selepas WFB = OT",muka1:"MUKA 1 — A No. (Bil. 1-15)",muka2:"MUKA 2 — B No. (Bil. 16-31)",aNo:"A No.",logTitle:"BUKU LOG KENDERAAN KERAJAAN",uploadTitle:"MUAT NAIK BUKTI & RESIT",dataTitle:"SEMUA DATA TERSIMPAN",exportTitle:"EKSPORT DATA",totalCost:"JUMLAH KESELURUHAN KOS BAHAN API:",clickUp:"Klik untuk muat naik"},
+  en:{appTitle:"WFB TIME CARD & GOVERNMENT VEHICLE LOG SYSTEM",subtitle:"Government of Malaysia • Premium Luxury Corporate Edition",tabKad:"TIME CARD",tabLog:"VEHICLE LOG",tabUpload:"UPLOAD",tabData:"ALL DATA",tabExport:"EXPORT",kadTitle:"WFB TIME CARD",wfbInfo:"⏰ WFB: 7:30 AM - 4:30 PM | Max: 9:00 AM - 6:00 PM | Late after 9:00 AM = RED | Before 7:00 AM / After WFB = OT",muka1:"PAGE 1 — A No. (No. 1-15)",muka2:"PAGE 2 — B No. (No. 16-31)",aNo:"A No.",logTitle:"GOVERNMENT VEHICLE LOG BOOK",uploadTitle:"UPLOAD EVIDENCE & RECEIPTS",dataTitle:"ALL SAVED DATA",exportTitle:"EXPORT DATA",totalCost:"TOTAL FUEL COST:",clickUp:"Click to upload"}
+};
+function setLang(l){
+  document.querySelectorAll('[data-i18n]').forEach(e=>{const k=e.dataset.i18n;if(I18N[l][k])e.textContent=I18N[l][k]});
+  document.querySelectorAll('.lang-switch button').forEach(b=>b.classList.toggle('active',b.dataset.lang===l));
+  document.documentElement.lang=l;
+}
+
+// ============ CLOCK ============
+function tickClock(){
+  const d=new Date();
+  const days=['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+  const months=['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
+  const h=d.getHours();
+  const m=String(d.getMinutes()).padStart(2,'0');
+  const s=String(d.getSeconds()).padStart(2,'0');
+  // Malay 12-hour periods: pagi 12:00am–11:59am, tengahari 12:00pm–2:59pm,
+  // petang 3:00pm–6:59pm, malam 7:00pm–11:59pm
+  let period;
+  if(h<12) period='pagi';
+  else if(h<15) period='tengah hari';
+  else if(h<19) period='petang';
+  else period='malam';
+  const h12=h%12||12;
+  const el=document.getElementById('liveClock');
+  if(el) el.textContent=`🕐 ${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} • ${h12}:${m}:${s} ${period}`;
+}
+setInterval(tickClock,1000); tickClock();
+
+// ============ TABS ============
+function showTab(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.closest('.tab-btn').classList.add('active');
+  if(id==='data') refreshData();
+}
+
+// ============ TIME VALIDATION ============
+function checkTime(input){
+  const v=input.value; if(!v){input.className='';return}
+  const [h,m]=v.split(':').map(Number);
+  const mins=h*60+m;
+  // 9:00 AM = 540, 7:00 AM = 420, 7:30 AM = 450, 6:00 PM = 1080, 4:30 PM = 990
+  input.classList.remove('late','ot');
+  const col=input.dataset.col;
+  if(col==='masuk1'){
+    if(mins>540) input.classList.add('late'); // after 9 AM = late RED
+    else if(mins<420) input.classList.add('ot'); // before 7 AM = OT
+  } else if(col==='keluar2'){
+    if(mins>1080) input.classList.add('ot'); // after 6 PM = OT
+    else if(mins>990 && mins<=1080) input.classList.add('ot');
+  }
+}
+
+// ============ BUILD KAD TABLES ============
+function buildKadTable(tbody,start,end){
+  const now=new Date();
+  const yyyy=now.getFullYear();
+  const mm=String(now.getMonth()+1).padStart(2,'0');
+  let html='';
+  for(let i=start;i<=end;i++){
+    const dd=String(i).padStart(2,'0');
+    html+=`<tr>
+      <td><b>${i}</b></td>
+      <td><input type="date" value="${yyyy}-${mm}-${dd}"></td>
+      <td><input type="time" data-col="masuk1" onchange="checkTime(this)"></td>
+      <td><input type="time" data-col="keluar1"></td>
+      <td><input type="time" data-col="masuk2"></td>
+      <td><input type="time" data-col="keluar2" onchange="checkTime(this)"></td>
+      <td><input type="text" placeholder="-"></td>
+      <td><input type="text" placeholder="T/T"></td>
+    </tr>`;
+  }
+  tbody.innerHTML=html;
+}
+buildKadTable(document.querySelector('#tbl1 tbody'),1,15);
+buildKadTable(document.querySelector('#tbl2 tbody'),16,31);
+
+// Set default month
+const nm=new Date(); const mv=`${nm.getFullYear()}-${String(nm.getMonth()+1).padStart(2,'0')}`;
+document.getElementById('bln1').value=mv;
+document.getElementById('bln2').value=mv;
+document.getElementById('logBulan').value=mv;
+
+// ============ LOG TABLE ============
+function addLogRow(){
+  const tb=document.querySelector('#tblLog tbody');
+  const i=tb.rows.length+1;
+  const today=new Date().toISOString().slice(0,10);
+  const tr=document.createElement('tr');
+  tr.innerHTML=`
+    <td><b>${i}</b></td>
+    <td><input type="date" value="${today}"></td>
+    <td><input type="time"></td>
+    <td><input type="time"></td>
+    <td><input type="text" placeholder="Pemandu"></td>
+    <td><input type="text" placeholder="Tujuan & lokasi"></td>
+    <td><input type="text" placeholder="Pelulus"></td>
+    <td><input type="text" placeholder="Pengguna"></td>
+    <td><input type="number" class="odo" oninput="recalcLog()"></td>
+    <td><input type="number" class="jarak" readonly style="background:#FFF8DC"></td>
+    <td><input type="text" class="kos" placeholder="RM / No.Resit" oninput="recalcLog()"></td>
+    <td><input type="number" step="0.01" class="liter" oninput="recalcLog()"></td>
+    <td><input type="text" placeholder="Nota"></td>
+    <td class="no-print"><button class="btn btn-ruby btn-sm" onclick="this.closest('tr').remove();renumLog();recalcLog()">✖</button></td>
+  `;
+  tb.appendChild(tr);
+}
+function renumLog(){document.querySelectorAll('#tblLog tbody tr').forEach((r,i)=>r.cells[0].innerHTML=`<b>${i+1}</b>`)}
+function recalcLog(){
+  const start=parseFloat(document.getElementById('logOdoStart').value)||0;
+  let prev=start, totKos=0, totKm=0, totLt=0;
+  document.querySelectorAll('#tblLog tbody tr').forEach(r=>{
+    const odo=parseFloat(r.querySelector('.odo').value)||0;
+    const jarak=odo>prev?odo-prev:0;
+    r.querySelector('.jarak').value=jarak||'';
+    if(odo>0)prev=odo;
+    totKm+=jarak;
+    const kosStr=r.querySelector('.kos').value||'';
+    const kosNum=parseFloat(kosStr.replace(/[^\d.]/g,''))||0;
+    totKos+=kosNum;
+    totLt+=parseFloat(r.querySelector('.liter').value)||0;
+  });
+  document.getElementById('totalKos').textContent=totKos.toFixed(2);
+  document.getElementById('totalKm').textContent=totKm.toFixed(0);
+  document.getElementById('totalLiter').textContent=totLt.toFixed(2);
+}
+// Add 5 initial rows
+for(let i=0;i<5;i++)addLogRow();
+
+// ============ AUTO FILL TODAY ============
+function autoFillToday(){
+  const today=new Date().getDate();
+  const tbl=today<=15?'#tbl1':'#tbl2';
+  const off=today<=15?1:16;
+  const row=document.querySelectorAll(tbl+' tbody tr')[today-off];
+  if(row){
+    const now=new Date();
+    const t=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    row.querySelectorAll('input[type=time]')[0].value=t;
+    checkTime(row.querySelectorAll('input[type=time]')[0]);
+    alert('✅ Masa masuk hari ini diisi: '+t);
+  }
+}
+
+// ============ SAVE / CLEAR ============
+function saveKad(){
+  const collect=(no,nama,kem,bhg,bln,tbl)=>{
+    const rows=[];
+    document.querySelectorAll(tbl+' tbody tr').forEach(r=>{
+      const inp=r.querySelectorAll('input');
+      rows.push({tarikh:inp[0].value,masuk1:inp[1].value,keluar1:inp[2].value,masuk2:inp[3].value,keluar2:inp[4].value,kenyataan:inp[5].value,tt:inp[6].value});
+    });
+    return {no:document.getElementById(no).value,nama:document.getElementById(nama).value,kem:document.getElementById(kem).value,bhg:document.getElementById(bhg).value,bulan:document.getElementById(bln).value,rows};
+  };
+  const rec={id:Date.now(),muka1:collect('aNo','nama1','kem1','bhg1','bln1','#tbl1'),muka2:collect('bNo','nama2','kem2','bhg2','bln2','#tbl2')};
+  DATA.kad.push(rec); STORE.k=DATA;
+  alert('✅ Kad waktu disimpan!');
+}
+function clearKad(){if(!confirm('Kosongkan kad?'))return;document.querySelectorAll('#kad input').forEach(i=>{if(i.type!=='month')i.value=''});buildKadTable(document.querySelector('#tbl1 tbody'),1,15);buildKadTable(document.querySelector('#tbl2 tbody'),16,31)}
+function saveLog(){
+  const rows=[];
+  document.querySelectorAll('#tblLog tbody tr').forEach(r=>{
+    const i=r.querySelectorAll('input');
+    rows.push({tarikh:i[0].value,pergi:i[1].value,balik:i[2].value,pemandu:i[3].value,tujuan:i[4].value,pelulus:i[5].value,pengguna:i[6].value,odo:i[7].value,jarak:i[8].value,kos:i[9].value,liter:i[10].value,nota:i[11].value});
+  });
+  const rec={id:Date.now(),bulan:document.getElementById('logBulan').value,noReg:document.getElementById('logNoReg').value,model:document.getElementById('logModel').value,odoStart:document.getElementById('logOdoStart').value,unit:document.getElementById('logUnit').value,pemandu:document.getElementById('logPemandu').value,rows,totalKos:document.getElementById('totalKos').textContent,totalKm:document.getElementById('totalKm').textContent};
+  DATA.log.push(rec); STORE.k=DATA;
+  alert('✅ Buku log disimpan!');
+}
+function clearLog(){if(!confirm('Kosongkan log?'))return;document.querySelectorAll('#log input').forEach(i=>{if(i.type!=='month')i.value=''});document.querySelector('#tblLog tbody').innerHTML='';for(let i=0;i<5;i++)addLogRow();recalcLog()}
+
+// ============ UPLOAD ============
+function handleUpload(e,type){
+  const files=e.target.files;
+  [...files].forEach(f=>{
+    const r=new FileReader();
+    r.onload=ev=>{
+      DATA.uploads[type].push({id:Date.now()+Math.random(),name:f.name,data:ev.target.result,date:new Date().toISOString()});
+      STORE.k=DATA; renderGallery(type);
+    };
+    r.readAsDataURL(f);
+  });
+}
+function renderGallery(type){
+  const g=document.getElementById('gal'+type.charAt(0).toUpperCase()+type.slice(1));
+  if(!g)return;
+  g.innerHTML=DATA.uploads[type].map(u=>`
+    <div class="gallery-item">
+      <img src="${u.data}" alt="${u.name}" onclick="window.open('${u.data}','_blank')">
+      <div class="label">${u.name.slice(0,20)}</div>
+      <button class="del" onclick="delUp('${type}','${u.id}')">✖</button>
+    </div>`).join('');
+}
+function delUp(type,id){DATA.uploads[type]=DATA.uploads[type].filter(u=>String(u.id)!==String(id));STORE.k=DATA;renderGallery(type)}
+['minyak','tng','odo'].forEach(renderGallery);
+
+// ============ DATA VIEW ============
+function refreshData(){
+  const vk=document.querySelector('#viewKad tbody');
+  vk.innerHTML=DATA.kad.map(k=>{
+    const all=[...k.muka1.rows,...k.muka2.rows];
+    const lewat=all.filter(r=>{if(!r.masuk1)return false;const[h,m]=r.masuk1.split(':').map(Number);return h*60+m>540}).length;
+    const ot=all.filter(r=>{if(!r.masuk1)return false;const[h,m]=r.masuk1.split(':').map(Number);return h*60+m<420}).length;
+    return `<tr><td>${k.muka1.no||'-'}</td><td>${k.muka1.nama||'-'}</td><td>${k.muka1.bulan||'-'}</td><td>${all.filter(r=>r.masuk1).length}</td><td style="color:red;font-weight:bold">${lewat}</td><td style="color:blue;font-weight:bold">${ot}</td><td><button class="btn btn-ruby btn-sm" onclick="delKad(${k.id})">✖</button></td></tr>`;
+  }).join('')||'<tr><td colspan="7" style="padding:20px">Tiada data</td></tr>';
+
+  const vl=document.querySelector('#viewLog tbody');
+  vl.innerHTML=DATA.log.map(l=>`<tr><td>${l.bulan||'-'}</td><td>${l.noReg||'-'}</td><td>${l.model||'-'}</td><td>${l.rows.filter(r=>r.tarikh).length}</td><td>${l.totalKm||0}</td><td>RM ${l.totalKos||0}</td><td><button class="btn btn-ruby btn-sm" onclick="delLog(${l.id})">✖</button></td></tr>`).join('')||'<tr><td colspan="7" style="padding:20px">Tiada data</td></tr>';
+
+  const ap=document.getElementById('viewAllPics');
+  const all=[...DATA.uploads.minyak.map(u=>({...u,t:'⛽'})),...DATA.uploads.tng.map(u=>({...u,t:'💳'})),...DATA.uploads.odo.map(u=>({...u,t:'🚙'}))];
+  ap.innerHTML=all.map(u=>`<div class="gallery-item"><img src="${u.data}" onclick="window.open('${u.data}','_blank')"><div class="label">${u.t} ${u.name.slice(0,15)}</div></div>`).join('')||'<p style="padding:14px;color:#666">Tiada gambar dimuat naik</p>';
+}
+function delKad(id){if(!confirm('Padam?'))return;DATA.kad=DATA.kad.filter(k=>k.id!==id);STORE.k=DATA;refreshData()}
+function delLog(id){if(!confirm('Padam?'))return;DATA.log=DATA.log.filter(l=>l.id!==id);STORE.k=DATA;refreshData()}
+function clearAll(){localStorage.removeItem('wfb_v10');location.reload()}
+
+// ============ EXPORT ============
+function exportCSV(type){
+  let csv='',name='';
+  if(type==='kad'){
+    name='kad_waktu.csv';
+    csv='No,Nama,Kem/Jab,Bahagian,Bulan,Tarikh,Masuk1,Keluar1,Masuk2,Keluar2,Kenyataan,T/T\n';
+    DATA.kad.forEach(k=>{
+      [...k.muka1.rows,...k.muka2.rows].forEach(r=>{
+        csv+=`"${k.muka1.no}","${k.muka1.nama}","${k.muka1.kem}","${k.muka1.bhg}","${k.muka1.bulan}","${r.tarikh}","${r.masuk1}","${r.keluar1}","${r.masuk2}","${r.keluar2}","${r.kenyataan}","${r.tt}"\n`;
+      });
+    });
+  } else {
+    name='buku_log.csv';
+    csv='Bulan,NoReg,Model,Tarikh,Pergi,Balik,Pemandu,Tujuan,Pelulus,Pengguna,OdoAkhir,Jarak,Kos,Liter,Nota\n';
+    DATA.log.forEach(l=>l.rows.forEach(r=>{
+      csv+=`"${l.bulan}","${l.noReg}","${l.model}","${r.tarikh}","${r.pergi}","${r.balik}","${r.pemandu}","${r.tujuan}","${r.pelulus}","${r.pengguna}","${r.odo}","${r.jarak}","${r.kos}","${r.liter}","${r.nota}"\n`;
+    }));
+  }
+  download(name,csv,'text/csv');
+}
+function exportExcel(type){
+  // Excel-compatible XML format
+  let rows='';
+  if(type==='kad'){
+    rows='<Row><Cell><Data ss:Type="String">No</Data></Cell><Cell><Data ss:Type="String">Nama</Data></Cell><Cell><Data ss:Type="String">Bulan</Data></Cell><Cell><Data ss:Type="String">Tarikh</Data></Cell><Cell><Data ss:Type="String">Masuk</Data></Cell><Cell><Data ss:Type="String">Keluar</Data></Cell></Row>';
+    DATA.kad.forEach(k=>[...k.muka1.rows,...k.muka2.rows].forEach(r=>{
+      rows+=`<Row><Cell><Data ss:Type="String">${k.muka1.no}</Data></Cell><Cell><Data ss:Type="String">${k.muka1.nama}</Data></Cell><Cell><Data ss:Type="String">${k.muka1.bulan}</Data></Cell><Cell><Data ss:Type="String">${r.tarikh}</Data></Cell><Cell><Data ss:Type="String">${r.masuk1}</Data></Cell><Cell><Data ss:Type="String">${r.keluar2}</Data></Cell></Row>`;
+    }));
+  } else {
+    rows='<Row><Cell><Data ss:Type="String">Bulan</Data></Cell><Cell><Data ss:Type="String">NoReg</Data></Cell><Cell><Data ss:Type="String">Tarikh</Data></Cell><Cell><Data ss:Type="String">Tujuan</Data></Cell><Cell><Data ss:Type="String">Jarak</Data></Cell><Cell><Data ss:Type="String">Kos</Data></Cell></Row>';
+    DATA.log.forEach(l=>l.rows.forEach(r=>{
+      rows+=`<Row><Cell><Data ss:Type="String">${l.bulan}</Data></Cell><Cell><Data ss:Type="String">${l.noReg}</Data></Cell><Cell><Data ss:Type="String">${r.tarikh}</Data></Cell><Cell><Data ss:Type="String">${r.tujuan}</Data></Cell><Cell><Data ss:Type="String">${r.jarak}</Data></Cell><Cell><Data ss:Type="String">${r.kos}</Data></Cell></Row>`;
+    }));
+  }
+  const xml=`<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="Data"><Table>${rows}</Table></Worksheet></Workbook>`;
+  download(type+'.xls',xml,'application/vnd.ms-excel');
+}
+function exportAccess(){
+  // Access-compatible: CSV with .accdb-friendly schema + SQL script
+  let sql='-- Microsoft Access Import Script (boleh diimport ke .accdb)\n';
+  sql+='CREATE TABLE KadWaktu (ID AUTOINCREMENT PRIMARY KEY, NoKad TEXT, Nama TEXT, Bulan TEXT, Tarikh DATE, Masuk1 TEXT, Keluar2 TEXT);\n';
+  DATA.kad.forEach(k=>[...k.muka1.rows,...k.muka2.rows].forEach(r=>{
+    if(r.tarikh)sql+=`INSERT INTO KadWaktu (NoKad,Nama,Bulan,Tarikh,Masuk1,Keluar2) VALUES ('${k.muka1.no}','${k.muka1.nama}','${k.muka1.bulan}','${r.tarikh}','${r.masuk1}','${r.keluar2}');\n`;
+  }));
+  sql+='\nCREATE TABLE BukuLog (ID AUTOINCREMENT PRIMARY KEY, Bulan TEXT, NoReg TEXT, Tarikh DATE, Tujuan TEXT, Jarak DOUBLE, Kos TEXT);\n';
+  DATA.log.forEach(l=>l.rows.forEach(r=>{
+    if(r.tarikh)sql+=`INSERT INTO BukuLog (Bulan,NoReg,Tarikh,Tujuan,Jarak,Kos) VALUES ('${l.bulan}','${l.noReg}','${r.tarikh}','${r.tujuan}',${r.jarak||0},'${r.kos}');\n`;
+  }));
+  download('access_import.sql',sql,'text/plain');
+  alert('✅ Fail SQL dimuat turun. Buka Microsoft Access → External Data → import skrip ini ke .accdb');
+}
+function exportJSON(){download('backup_'+Date.now()+'.json',JSON.stringify(DATA,null,2),'application/json')}
+function importJSON(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{DATA=JSON.parse(ev.target.result);STORE.k=DATA;alert('✅ Import berjaya!');location.reload()}catch(err){alert('❌ Fail tidak sah')}};r.readAsText(f)}
+function download(name,content,mime){
+  const blob=new Blob(['\ufeff'+content],{type:mime});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
+}
+function printSection(id){showTab(id);setTimeout(()=>window.print(),300)}
+
+// ============ PROFILE (auto-hide) ============
+let pfTimer;
+function toggleProfile(){
+  const p=document.getElementById('profilePanel');p.classList.toggle('show');
+  if(p.classList.contains('show')){
+    document.getElementById('pfNama').value=DATA.profile.nama||'';
+    document.getElementById('pfNoPek').value=DATA.profile.noPek||'';
+    document.getElementById('pfJawatan').value=DATA.profile.jawatan||'';
+    clearTimeout(pfTimer); pfTimer=setTimeout(()=>p.classList.remove('show'),8000);
+  }
+}
+function saveProfile(){
+  DATA.profile={nama:document.getElementById('pfNama').value,noPek:document.getElementById('pfNoPek').value,jawatan:document.getElementById('pfJawatan').value};
+  STORE.k=DATA; alert('✅ Profil disimpan!');
+  document.getElementById('profilePanel').classList.remove('show');
+}
+
+// ============ SUPABASE CLOUD + GOOGLE AUTH ============
+// 🔧 KONFIGURASI: Ganti dengan kredensial projek Supabase anda
+const SUPABASE_URL = 'https://cakjtqwnobqztznzhdyt.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNha2p0cXdub2JxenR6bnpoZHl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NjQ2NzQsImV4cCI6MjA5MzE0MDY3NH0.FGiOLDprt-cA_VM32YraV7FqaRpw90pxVljorz_bdoo';
+
+let sb=null, currentUser=null;
+try{
+  if(window.supabase && SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('YOUR-PROJECT')){
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+}catch(e){console.warn('Supabase init gagal',e)}
+
+function setAuthUI(user){
+  currentUser=user;
+  const s=document.getElementById('authStatus');
+  const bi=document.getElementById('btnLogin');
+  const bo=document.getElementById('btnLogout');
+  const bs=document.getElementById('btnSync');
+  if(!sb){ s.textContent='⚠️ Cloud belum dikonfigurasi (mod luar talian)'; bi.style.display='none'; bo.style.display='none'; bs.style.display='none'; return }
+  if(user){
+    s.innerHTML=`✅ <b>${user.user_metadata?.full_name||user.email}</b>`;
+    bi.style.display='none'; bo.style.display='inline-flex'; bs.style.display='inline-flex';
+  }else{
+    s.textContent='🔒 Belum log masuk';
+    bi.style.display='inline-flex'; bo.style.display='none'; bs.style.display='none';
+  }
+}
+async function loginGoogle(){
+  if(!sb){alert('⚠️ Supabase belum dikonfigurasi. Edit SUPABASE_URL & SUPABASE_ANON_KEY dalam fail HTML.');return}
+  const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
+  if(error)alert('❌ Login gagal: '+error.message);
+}
+async function logout(){
+  if(!sb)return;
+  await sb.auth.signOut();
+  setAuthUI(null);
+  alert('✅ Log keluar berjaya');
+}
+
+// Sync: simpan satu rekod per user (upsert) + pull bila login
+async function pushToCloud(){
+  if(!sb||!currentUser)return;
+  const payload={user_id:currentUser.id, email:currentUser.email, data:DATA, updated_at:new Date().toISOString()};
+  const {error}=await sb.from('wfb_data').upsert(payload,{onConflict:'user_id'});
+  if(error)console.warn('Push gagal:',error.message);
+}
+async function syncFromCloud(){
+  if(!sb||!currentUser){alert('Sila log masuk dahulu');return}
+  const {data,error}=await sb.from('wfb_data').select('data').eq('user_id',currentUser.id).maybeSingle();
+  if(error){alert('❌ Sync gagal: '+error.message);return}
+  if(data && data.data){
+    DATA = data.data;
+    DATA.kad=DATA.kad||[]; DATA.log=DATA.log||[]; DATA.uploads=DATA.uploads||{minyak:[],tng:[],odo:[]}; DATA.profile=DATA.profile||{};
+    STORE.k=DATA;
+    ['minyak','tng','odo'].forEach(renderGallery);
+    refreshData();
+    alert('✅ Data dimuat turun dari Cloud');
+  }else{
+    alert('ℹ️ Tiada data dalam Cloud lagi. Simpan data untuk sync.');
+    pushToCloud();
+  }
+}
+
+// Auto-push selepas setiap setter STORE.k
+const _origSet=Object.getOwnPropertyDescriptor(STORE,'k').set;
+Object.defineProperty(STORE,'k',{
+  get(){return JSON.parse(localStorage.getItem('wfb_v10')||'{}')},
+  set(v){
+    localStorage.setItem('wfb_v10',JSON.stringify(v));
+    if(currentUser) pushToCloud();
+  }
+});
+
+// Auth listener
+if(sb){
+  sb.auth.getSession().then(({data})=>{
+    setAuthUI(data.session?.user||null);
+    if(data.session?.user) syncFromCloud();
+  });
+  sb.auth.onAuthStateChange((_e,session)=>{
+    setAuthUI(session?.user||null);
+    if(session?.user) syncFromCloud();
+  });
+}else{
+  setAuthUI(null);
+}
+
+// ============ DATA VIEW: Tambah pandangan Cloud ============
+async function viewCloudData(){
+  if(!sb||!currentUser){alert('Sila log masuk');return}
+  const {data,error}=await sb.from('wfb_data').select('*').eq('user_id',currentUser.id).maybeSingle();
+  const box=document.getElementById('cloudBox');
+  if(!box)return;
+  if(error||!data){box.innerHTML='<p style="padding:14px;color:#666">Tiada data dalam Cloud</p>';return}
+  box.innerHTML=`<div style="padding:14px;background:#f9f5e7;border:2px solid var(--gold);border-radius:8px">
+    <b>☁️ Data Cloud (Supabase)</b><br>
+    <small>User: ${data.email} • Updated: ${new Date(data.updated_at).toLocaleString('ms-MY')}</small><br><br>
+    📋 Kad Waktu: <b>${(data.data.kad||[]).length}</b> rekod<br>
+    🚗 Buku Log: <b>${(data.data.log||[]).length}</b> rekod<br>
+    📸 Upload: <b>${(data.data.uploads?.minyak||[]).length+(data.data.uploads?.tng||[]).length+(data.data.uploads?.odo||[]).length}</b> gambar
+  </div>`;
+}
+
+// Init
+recalcLog();
+</script>
 </body>
 </html>
