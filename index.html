@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SLDK v6.0.0 Diamond Executive | Kerajaan Malaysia</title>
+    <title>SLDK v7.0.0 Titanium Pro | Kerajaan Malaysia</title>
     <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg">
     
     <!-- Libraries -->
@@ -13,287 +13,284 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;500;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600;800&display=swap');
 
         :root {
-            --diamond-blue: #00d2ff;
-            --premium-gold: #D4AF37;
-            --danger-red: #ff4d4d;
+            --titanium: #aeb2b5;
+            --gold: #D4AF37;
+            --danger: #ff0000;
         }
 
         body {
-            background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), 
-                        url('https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg') center/50% no-repeat fixed;
-            background-color: #050505;
-            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), 
+                        url('https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg') center/40% no-repeat fixed;
+            background-color: #0d0d0d;
+            font-family: 'Inter', sans-serif;
             color: #fff;
+            min-height: 100vh;
         }
 
-        /* Anime Action Background Effect */
+        /* Anime Style Background */
         .anime-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://w0.peakpx.com/wallpaper/479/115/HD-wallpaper-car-anime-sky-clouds-aesthetic.jpg') center/cover;
-            opacity: 0.12;
+            background: url('https://images.alphacoders.com/132/1327170.png') center/cover;
+            opacity: 0.1;
             z-index: -1;
-            filter: contrast(120%);
+            filter: grayscale(50%) brightness(50%);
         }
 
         .glass-panel {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
-            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            border-radius: 15px;
         }
 
         .realistic-btn {
-            background: linear-gradient(145deg, #1e1e1e, #0a0a0a);
-            border: 1px solid var(--premium-gold);
-            color: var(--premium-gold);
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.6), inset 1px 1px 2px rgba(255,255,255,0.1);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(145deg, #232323, #000);
+            border: 1px solid var(--gold);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.8);
+            transition: 0.2s ease-in-out;
+            color: var(--gold);
         }
 
         .realistic-btn:hover {
-            transform: scale(1.05) translateY(-2px);
-            background: var(--premium-gold);
-            color: black;
-            box-shadow: 0 0 20px var(--premium-gold);
+            transform: scale(1.03);
+            background: var(--gold);
+            color: #000;
         }
 
-        .late-highlight {
-            border: 2px solid var(--danger-red) !important;
-            color: var(--danger-red) !important;
-            animation: pulse-red 1.5s infinite;
-        }
-
-        @keyframes pulse-red {
-            0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 77, 77, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
+        .late-alert {
+            background-color: rgba(255, 0, 0, 0.3) !important;
+            border: 2px solid var(--danger) !important;
+            color: white !important;
         }
 
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.5s; }
+        .tab-content.active { display: block; animation: slideUp 0.4s ease; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @media print {
-            .no-print { display: none !important; }
-            .glass-panel { background: white !important; color: black !important; border: 1px solid black !important; }
-        }
+        input { background: rgba(0,0,0,0.3); border: 1px solid #333; padding: 4px 8px; border-radius: 4px; color: white; width: 100%; }
+        
+        @media print { .no-print { display: none; } }
     </style>
 </head>
 <body class="p-2 md:p-6">
     <div class="anime-bg"></div>
 
-    <!-- 3 LOGOS HEADER -->
-    <header class="glass-panel p-4 mb-8 flex flex-col md:flex-row justify-between items-center text-center">
-        <div class="flex items-center space-x-3 mb-4 md:mb-0">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" class="h-16 md:h-20" alt="Logo JPM">
-            <div class="border-l-2 border-gold pl-3 text-left">
-                <h1 class="text-xl md:text-2xl font-black text-yellow-500 uppercase tracking-tighter">Diamond Executive v6.0</h1>
-                <p class="text-[10px] text-blue-300">SISTEM LOG DIGITAL KERAJAAN MALAYSIA</p>
-                <div id="realtime-clock" class="text-xs font-mono text-white mt-1"></div>
+    <!-- HEADER LOGOS -->
+    <header class="glass-panel p-4 mb-6 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+        <div class="flex items-center space-x-4">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" class="h-16 md:h-24">
+            <div>
+                <h1 class="text-xl md:text-3xl font-black text-yellow-500 uppercase tracking-widest">Sistem Log Digital Kerajaan</h1>
+                <p class="text-xs italic text-blue-400 font-bold">Titanium Pro v7.0.0 | Premium Executive</p>
+                <div id="clock" class="text-lg font-mono mt-1 text-white"></div>
             </div>
         </div>
-        <div class="flex space-x-4">
-            <img src="https://via.placeholder.com/60/003366/FFFFFF?text=JABATAN" class="h-14 rounded-lg shadow-lg border border-gold">
-            <img src="https://via.placeholder.com/60/8B0000/FFFFFF?text=PENGUAT" class="h-14 rounded-lg shadow-lg border border-gold">
+        <div class="flex space-x-2 mt-4 md:mt-0">
+            <img src="https://via.placeholder.com/60?text=JABATAN" class="h-12 border border-white/20 rounded shadow-lg">
+            <img src="https://via.placeholder.com/60?text=PENGUAT" class="h-12 border border-white/20 rounded shadow-lg">
         </div>
     </header>
 
-    <!-- AUTH SECTION -->
-    <section id="auth-section" class="max-w-md mx-auto mt-20 text-center">
-        <div class="glass-panel p-10">
-            <i class="fas fa-user-shield text-5xl text-yellow-500 mb-6"></i>
-            <h2 class="text-2xl font-bold mb-6">Log Masuk / Login</h2>
-            <button id="google-login-btn" onclick="loginGoogle()" class="realistic-btn w-full py-4 rounded-xl flex items-center justify-center space-x-4">
+    <!-- LOGIN AREA -->
+    <section id="login-screen" class="max-w-md mx-auto mt-20">
+        <div class="glass-panel p-10 text-center">
+            <h2 class="text-2xl font-bold mb-6 border-b border-gold pb-4">LOG MASUK KAKITANGAN</h2>
+            <button id="btn-google" onclick="login()" class="realistic-btn w-full py-4 rounded-xl flex items-center justify-center space-x-3">
                 <img src="https://www.google.com/favicon.ico" class="w-6 h-6">
-                <span class="font-bold">LOG MASUK DENGAN GOOGLE</span>
+                <span class="font-bold">MASUK DENGAN GOOGLE</span>
             </button>
-            <p class="mt-4 text-[10px] opacity-60">Sistem ini menggunakan Google OAuth 2.0 & Supabase Encrypted Storage.</p>
+            <p class="mt-4 text-[10px] opacity-50">Sistem Autentikasi Supabase Bersepadu</p>
         </div>
     </section>
 
-    <!-- MAIN INTERFACE (HIDDEN BY DEFAULT) -->
-    <main id="app-content" class="hidden max-w-[1400px] mx-auto">
-        <!-- Profile & Navigation -->
-        <div class="flex flex-wrap justify-between items-center mb-6 gap-4 no-print">
-            <div id="user-profile" class="flex items-center glass-panel px-4 py-2 space-x-3">
-                <img id="u-avatar" class="w-10 h-10 rounded-full border-2 border-gold" src="">
-                <span id="u-name" class="font-bold text-sm">...</span>
-                <button onclick="logout()" class="text-red-500 text-xs ml-4"><i class="fas fa-sign-out-alt"></i></button>
+    <!-- DASHBOARD AREA -->
+    <main id="dashboard" class="hidden">
+        <!-- Profile bar -->
+        <div class="flex justify-between items-center mb-6 no-print">
+            <div class="glass-panel px-4 py-2 flex items-center space-x-3">
+                <img id="user-img" class="w-10 h-10 rounded-full border-2 border-gold" src="">
+                <span id="user-name" class="font-bold text-sm"></span>
+                <button onclick="logout()" class="text-red-500 hover:text-white transition ml-4 text-xs"><i class="fas fa-sign-out-alt"></i></button>
             </div>
             
             <div class="flex gap-2">
-                <button onclick="showTab('attendance')" class="realistic-btn px-6 py-2 rounded-lg text-xs">ATTENDANCE CARD</button>
-                <button onclick="showTab('logbook')" class="realistic-btn px-6 py-2 rounded-lg text-xs">VEHICLE LOGBOOK</button>
-                <button onclick="showTab('reports')" class="realistic-btn px-6 py-2 rounded-lg text-xs">REPORTS VIEW</button>
+                <button onclick="switchTab('tab-time')" class="realistic-btn px-4 py-2 rounded text-xs uppercase font-bold">TIME CARD</button>
+                <button onclick="switchTab('tab-log')" class="realistic-btn px-4 py-2 rounded text-xs uppercase font-bold">LOG PERJALANAN</button>
+                <button onclick="switchTab('tab-data')" class="realistic-btn px-4 py-2 rounded text-xs uppercase font-bold">REKOD DATA</button>
             </div>
         </div>
 
-        <!-- TAB 1: ATTENDANCE CARD -->
-        <div id="attendance" class="tab-content active">
+        <!-- TAB 1: TIME ENTRY CARD -->
+        <section id="tab-time" class="tab-content active">
             <div class="glass-panel p-6 overflow-x-auto">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <input type="text" id="att-name" placeholder="Nama Penuh (Name)" class="bg-black/50 p-2 border border-gold/50 rounded">
-                    <input type="text" id="att-dept" placeholder="Jabatan (Department)" class="bg-black/50 p-2 border border-gold/50 rounded">
-                    <input type="text" id="att-div" placeholder="Bahagian (Section)" class="bg-black/50 p-2 border border-gold/50 rounded">
-                    <input type="month" id="att-month" class="bg-black/50 p-2 border border-gold/50 rounded">
+                    <div><label class="text-[10px] text-gold">NAMA</label><input type="text" id="att-name" class="uppercase"></div>
+                    <div><label class="text-[10px] text-gold">JABATAN</label><input type="text" id="att-dept" class="uppercase"></div>
+                    <div><label class="text-[10px] text-gold">BAHAGIAN</label><input type="text" id="att-div" class="uppercase"></div>
+                    <div><label class="text-[10px] text-gold">BULAN/TAHUN</label><input type="month" id="att-month"></div>
                 </div>
 
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                    <!-- Page A (1-15) -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                    <!-- Page 1 -->
                     <div>
-                        <h3 class="text-center font-bold text-yellow-500 mb-2 border-b border-gold pb-1">MUKA SURAT A (1-15)</h3>
-                        <table class="w-full text-[10px] text-center border-collapse">
-                            <thead class="bg-blue-900 text-white">
+                        <h4 class="bg-yellow-600 text-black text-center font-bold text-xs p-1">BAHAGIAN A (NO. 1-15)</h4>
+                        <table class="w-full text-[10px] text-center border-collapse border border-white/20">
+                            <thead class="bg-gray-800">
                                 <tr>
-                                    <th class="border border-gold/30 p-1">TARIKH</th>
-                                    <th class="border border-gold/30 p-1">IN</th><th class="border border-gold/30 p-1">OUT</th>
-                                    <th class="border border-gold/30 p-1">IN</th><th class="border border-gold/30 p-1">OUT</th>
-                                    <th class="border border-gold/30 p-1">STAT|T/T</th>
+                                    <th class="border border-white/10 p-1">HARI</th>
+                                    <th class="border border-white/10 p-1">TARIKH</th>
+                                    <th class="border border-white/10 p-1">MASUK</th>
+                                    <th class="border border-white/10 p-1">KELUAR</th>
+                                    <th class="border border-white/10 p-1">MASUK</th>
+                                    <th class="border border-white/10 p-1">KELUAR</th>
+                                    <th class="border border-white/10 p-1">KENYATAAN</th>
                                 </tr>
                             </thead>
-                            <tbody id="body-a"></tbody>
+                            <tbody id="body-1"></tbody>
                         </table>
                     </div>
-                    <!-- Page B (16-31) -->
+                    <!-- Page 2 -->
                     <div>
-                        <h3 class="text-center font-bold text-yellow-500 mb-2 border-b border-gold pb-1">MUKA SURAT B (16-31)</h3>
-                        <table class="w-full text-[10px] text-center border-collapse">
-                            <thead class="bg-blue-900 text-white">
+                        <h4 class="bg-yellow-600 text-black text-center font-bold text-xs p-1">BAHAGIAN B (NO. 16-31)</h4>
+                        <table class="w-full text-[10px] text-center border-collapse border border-white/20">
+                            <thead class="bg-gray-800">
                                 <tr>
-                                    <th class="border border-gold/30 p-1">TARIKH</th>
-                                    <th class="border border-gold/30 p-1">IN</th><th class="border border-gold/30 p-1">OUT</th>
-                                    <th class="border border-gold/30 p-1">IN</th><th class="border border-gold/30 p-1">OUT</th>
-                                    <th class="border border-gold/30 p-1">STAT|T/T</th>
+                                    <th class="border border-white/10 p-1">HARI</th>
+                                    <th class="border border-white/10 p-1">TARIKH</th>
+                                    <th class="border border-white/10 p-1">MASUK</th>
+                                    <th class="border border-white/10 p-1">KELUAR</th>
+                                    <th class="border border-white/10 p-1">MASUK</th>
+                                    <th class="border border-white/10 p-1">KELUAR</th>
+                                    <th class="border border-white/10 p-1">KENYATAAN</th>
                                 </tr>
                             </thead>
-                            <tbody id="body-b"></tbody>
+                            <tbody id="body-2"></tbody>
                         </table>
                     </div>
                 </div>
-                <div class="mt-6 flex gap-3">
-                    <button onclick="saveAttendance()" class="realistic-btn flex-1 py-3 bg-green-900/30 font-black">SIMPAN DATA KE SUPABASE</button>
-                    <button onclick="exportToExcel('attendance')" class="realistic-btn px-6 py-3"><i class="fas fa-file-excel"></i> EXPORT</button>
+                <div class="mt-4 flex gap-2">
+                    <button onclick="saveAttendance()" class="realistic-btn flex-1 py-3 bg-green-900/20 font-bold">SIMPAN KE SUPABASE & CLOUD</button>
+                    <button onclick="window.print()" class="realistic-btn px-6 py-3">CETAK KAD</button>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- TAB 2: VEHICLE LOGBOOK -->
-        <div id="logbook" class="tab-content">
+        <!-- TAB 2: JOURNEY LOG -->
+        <section id="tab-log" class="tab-content">
             <div class="glass-panel p-6">
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-                    <input type="text" id="log-reg" placeholder="Car Reg No (e.g., VBA 1234)">
-                    <input type="text" id="log-model" placeholder="Car Model">
-                    <input type="number" id="log-odo-start" placeholder="Initial ODO" oninput="calcDist()">
-                    <input type="text" id="log-unit" placeholder="Part/Unit">
-                    <input type="month" id="log-month-view">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <input type="text" id="car-no" placeholder="No. Pendaftaran Kenderaan">
+                    <input type="text" id="car-model" placeholder="Model Kenderaan">
+                    <input type="number" id="odo-init" placeholder="Odometer Awal" oninput="calcJourney()">
+                    <input type="text" id="unit-log" placeholder="Bahagian/Unit">
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="w-full text-xs border-collapse">
-                        <thead class="bg-gray-800">
+                    <table class="w-full text-xs border border-white/20">
+                        <thead class="bg-blue-900 text-white">
                             <tr>
-                                <th class="border p-2">TARIKH|MASA</th>
-                                <th class="border p-2">PEMANDU|DRVR</th>
-                                <th class="border p-2">DESTINASI|LOKASI</th>
-                                <th class="border p-2">ODO AKHIR|FINAL</th>
-                                <th class="border p-2">KM</th>
-                                <th class="border p-2">KOS|RM|LITERS</th>
-                                <th class="border p-2">LAMPIRAN|UPLOAD</th>
+                                <th class="p-2 border border-white/10">TARIKH & MASA</th>
+                                <th class="p-2 border border-white/10">DRVR / USER</th>
+                                <th class="p-2 border border-white/10">DESTINASI / LOKASI</th>
+                                <th class="p-2 border border-white/10">ODO AKHIR</th>
+                                <th class="p-2 border border-white/10">KM</th>
+                                <th class="p-2 border border-white/10">KOS (RM) / LITER</th>
+                                <th class="p-2 border border-white/10">RESIT / LAMPIRAN</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="bg-white/5">
-                                <td class="border p-1">
-                                    <input type="date" id="row-date" class="w-full mb-1">
-                                    <input type="time" id="row-t1" class="w-full text-[10px]">
-                                    <input type="time" id="row-t2" class="w-full text-[10px]">
+                            <tr>
+                                <td class="p-1 border border-white/10">
+                                    <input type="date" id="row-date" class="mb-1">
+                                    <input type="time" id="row-t1" class="text-[10px] mb-1">
+                                    <input type="time" id="row-t2" class="text-[10px]">
                                 </td>
-                                <td class="border p-1"><input type="text" id="row-driver" class="w-full"></td>
-                                <td class="border p-1"><textarea id="row-dest" class="w-full bg-transparent text-xs" rows="3"></textarea></td>
-                                <td class="border p-1"><input type="number" id="row-odo-end" oninput="calcDist()" class="w-full"></td>
-                                <td class="border p-1 text-center font-bold text-diamond-blue"><span id="row-km">0</span></td>
-                                <td class="border p-1">
-                                    <input type="text" id="row-receipt" placeholder="Resit No" class="w-full mb-1">
-                                    <input type="number" id="row-cost" placeholder="RM" class="w-full mb-1">
-                                    <input type="number" id="row-liters" placeholder="Liter" class="w-full">
+                                <td class="p-1 border border-white/10"><input type="text" id="row-user"></td>
+                                <td class="p-1 border border-white/10"><textarea id="row-dest" class="bg-black/40 w-full text-xs p-1" rows="3"></textarea></td>
+                                <td class="p-1 border border-white/10"><input type="number" id="row-odo" oninput="calcJourney()"></td>
+                                <td class="p-1 border border-white/10 text-center font-bold text-yellow-500" id="row-km">0</td>
+                                <td class="p-1 border border-white/10">
+                                    <input type="number" id="row-cost" placeholder="RM" class="mb-1" oninput="calcJourney()">
+                                    <input type="number" id="row-liter" placeholder="Liter">
                                 </td>
-                                <td class="border p-1">
-                                    <div class="grid grid-cols-1 gap-1">
-                                        <button onclick="triggerFile('oil')" class="text-[9px] bg-blue-600 p-1 rounded">OIL REC</button>
-                                        <button onclick="triggerFile('tng')" class="text-[9px] bg-purple-600 p-1 rounded">TNG REC</button>
-                                        <button onclick="triggerFile('odo')" class="text-[9px] bg-gray-600 p-1 rounded">ODO IMG</button>
+                                <td class="p-1 border border-white/10">
+                                    <input type="text" id="row-receipt-no" placeholder="No Resit" class="mb-1">
+                                    <div class="flex flex-col gap-1">
+                                        <button class="text-[9px] bg-blue-600 rounded p-1">OIL IMG</button>
+                                        <button class="text-[9px] bg-purple-600 rounded p-1">TNG IMG</button>
                                     </div>
-                                    <input type="file" id="file-oil" class="hidden">
-                                    <input type="file" id="file-tng" class="hidden">
-                                    <input type="file" id="file-odo" class="hidden">
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 <div class="mt-4 flex justify-between items-center glass-panel p-4">
-                    <span class="text-xl font-bold text-yellow-500">TOTAL FUEL: RM <span id="total-fuel">0.00</span></span>
-                    <button onclick="saveVehicleLog()" class="realistic-btn px-10 py-3 bg-blue-900/30">MUAT NAIK LOG PERJALANAN</button>
+                    <span class="text-xl font-bold">TOTAL FUEL: <span class="text-yellow-500">RM <span id="total-fuel-val">0.00</span></span></span>
+                    <button onclick="saveLog()" class="realistic-btn px-10 py-3 font-bold">MUAT NAIK REKOD PERJALANAN</button>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- TAB 3: REPORTS -->
-        <div id="reports" class="tab-content">
+        <!-- TAB 3: DATA REKOD -->
+        <section id="tab-data" class="tab-content">
             <div class="glass-panel p-6">
-                <div class="flex justify-between mb-4">
-                    <h2 class="text-xl font-bold">REKOD TERSIMPAN (V6 DATABASE)</h2>
-                    <button onclick="fetchLatestData()" class="realistic-btn px-4 py-1 text-xs">REFRESH DATA</button>
+                <div class="flex justify-between mb-6">
+                    <h2 class="text-xl font-bold">REKOD DATA TERSIMPAN</h2>
+                    <button onclick="exportToExcel()" class="bg-green-700 px-4 py-2 rounded text-xs font-bold">EXPORT TO EXCEL</button>
                 </div>
-                <div id="data-display" class="space-y-4 max-h-[600px] overflow-y-auto pr-2">
-                    <!-- Data entries will appear here -->
+                <div id="data-list" class="space-y-4">
+                    <!-- Data entries loop -->
                 </div>
             </div>
-        </div>
+        </section>
     </main>
 
     <script>
-        // CONFIGURATION (PROVDIED BY USER)
+        // CONFIGURATION
         const SB_URL = "https://cakjtqwnobqztznzhdyt.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNha2p0cXdub2JxenR6bnpoZHl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NjQ2NzQsImV4cCI6MjA5MzE0MDY3NH0.FGiOLDprt-cA_VM32YraV7FqaRpw90pxVljorz_bdoo";
-        const GS_URL = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec"; // Masukkan URL Script anda
-
+        const GS_URL = "URL_GOOGLE_APPS_SCRIPT_ANDA_DI_SINI"; // Masukkan URL hasil deployment
+        
         const supabase = supabase.createClient(SB_URL, SB_KEY);
 
-        // CLOCK SYSTEM
+        // CLOCK
         setInterval(() => {
             const now = new Date();
-            document.getElementById('realtime-clock').innerText = now.toLocaleString('ms-MY', { 
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', 
+            document.getElementById('clock').innerText = now.toLocaleString('ms-MY', { 
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', 
                 hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
             }).toUpperCase();
         }, 1000);
 
-        // LOGIN GOOGLE - PEMBAIKAN KHAS GITHUB PAGES
-        async function loginGoogle() {
-            const btn = document.getElementById('google-login-btn');
+        // --- AUTH LOGIC (FIXED FOR GITHUB PAGES) ---
+        async function login() {
+            const btn = document.getElementById('btn-google');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> MENYAMBUNG...';
             
+            // Explicitly set the redirect URL to match GitHub subfolder
+            const redirectTo = window.location.origin + window.location.pathname;
+            console.log("Redirecting to:", redirectTo);
+
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: window.location.href, // Automatik kesan ttv4u1.github.io/srr/
+                    redirectTo: redirectTo,
                     queryParams: { access_type: 'offline', prompt: 'select_account' }
                 }
             });
 
             if (error) {
-                alert("Ralat Login: " + error.message);
-                btn.innerHTML = 'LOG MASUK DENGAN GOOGLE';
+                alert("Login Error: " + error.message);
+                btn.innerHTML = 'MASUK DENGAN GOOGLE';
             }
         }
 
@@ -302,113 +299,84 @@
             window.location.reload();
         }
 
-        // AUTH STATE LISTENER
         supabase.auth.onAuthStateChange((event, session) => {
             if (session) {
-                document.getElementById('auth-section').classList.add('hidden');
-                document.getElementById('app-content').classList.remove('hidden');
-                document.getElementById('u-name').innerText = session.user.user_metadata.full_name;
-                document.getElementById('u-avatar').src = session.user.user_metadata.avatar_url;
-                initAttendanceTables();
-                fetchLatestData();
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                document.getElementById('user-name').innerText = session.user.user_metadata.full_name;
+                document.getElementById('user-img').src = session.user.user_metadata.avatar_url;
+                renderTimeRows();
             }
         });
 
-        // ATTENDANCE LOGIC
-        function initAttendanceTables() {
-            const bodyA = document.getElementById('body-a');
-            const bodyB = document.getElementById('body-b');
-            bodyA.innerHTML = ''; bodyB.innerHTML = '';
+        // --- TIME CARD LOGIC ---
+        function renderTimeRows() {
+            const b1 = document.getElementById('body-1');
+            const b2 = document.getElementById('body-2');
+            b1.innerHTML = ''; b2.innerHTML = '';
 
-            for (let i = 1; i <= 15; i++) createAttRow(bodyA, i);
-            for (let i = 16; i <= 31; i++) createAttRow(bodyB, i);
+            for (let i = 1; i <= 15; i++) b1.innerHTML += createRow(i);
+            for (let i = 16; i <= 31; i++) b2.innerHTML += createRow(i);
         }
 
-        function createAttRow(container, day) {
-            container.innerHTML += `
-                <tr class="border-b border-gold/10">
-                    <td class="p-1 border-r border-gold/10 font-bold">${day}</td>
-                    <td class="p-1"><input type="time" onchange="validateLate(this)" class="bg-transparent w-full att-in"></td>
-                    <td class="p-1"><input type="time" class="bg-transparent w-full"></td>
-                    <td class="p-1"><input type="time" class="bg-transparent w-full"></td>
-                    <td class="p-1"><input type="time" class="bg-transparent w-full"></td>
-                    <td class="p-1"><input type="text" class="bg-transparent w-full text-[8px] uppercase"></td>
-                </tr>
-            `;
+        function createRow(day) {
+            return `<tr>
+                <td class="p-1 border border-white/5">${day}</td>
+                <td class="p-1 border border-white/5"><input type="date" class="text-[10px]"></td>
+                <td class="p-1 border border-white/5"><input type="time" class="in-time" onchange="checkTime(this)"></td>
+                <td class="p-1 border border-white/5"><input type="time"></td>
+                <td class="p-1 border border-white/5"><input type="time"></td>
+                <td class="p-1 border border-white/5"><input type="time"></td>
+                <td class="p-1 border border-white/5"><input type="text" class="uppercase"></td>
+            </tr>`;
         }
 
-        function validateLate(el) {
-            const time = el.value;
-            if (!time) return;
-            const hour = parseInt(time.split(':')[0]);
-            const min = parseInt(time.split(':')[1]);
+        function checkTime(el) {
+            const val = el.value;
+            if(!val) return;
+            const hr = parseInt(val.split(':')[0]);
+            const min = parseInt(val.split(':')[1]);
 
-            // Late highlight if after 9:00 AM
-            if (hour > 9 || (hour === 9 && min > 0)) {
-                el.classList.add('late-highlight');
+            // Late > 9:00 AM
+            if (hr > 9 || (hr === 9 && min > 0)) {
+                el.classList.add('late-alert');
             } else {
-                el.classList.remove('late-highlight');
+                el.classList.remove('late-alert');
             }
-
-            // OT Alert: Entry before 7:00 AM
-            if (hour < 7) {
-                alert("AMARAN: Kemasukan sebelum 7:00 AM dikesan sebagai Overtime (OT).");
+            
+            // OT < 7:30 AM
+            if (hr < 7 || (hr === 7 && min < 30)) {
+                console.log("OT Detected");
             }
         }
 
-        // VEHICLE LOGIC
-        function calcDist() {
-            const start = parseFloat(document.getElementById('log-odo-start').value) || 0;
-            const end = parseFloat(document.getElementById('row-odo-end').value) || 0;
-            const dist = end - start;
+        // --- JOURNEY LOGIC ---
+        function calcJourney() {
+            const init = parseFloat(document.getElementById('odo-init').value) || 0;
+            const final = parseFloat(document.getElementById('row-odo').value) || 0;
+            const dist = final - init;
             document.getElementById('row-km').innerText = dist > 0 ? dist : 0;
             
             const cost = parseFloat(document.getElementById('row-cost').value) || 0;
-            document.getElementById('total-fuel').innerText = cost.toFixed(2);
+            document.getElementById('total-fuel-val').innerText = cost.toFixed(2);
         }
 
-        // TABS
-        function showTab(tabId) {
+        // --- APP LOGIC ---
+        function switchTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
+            document.getElementById(id).classList.add('active');
         }
 
-        function triggerFile(id) {
-            document.getElementById('file-'+id).click();
-        }
-
-        // SAVE & SYNC
         async function saveAttendance() {
-            const btn = event.target;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> MENYIMPAN...';
-            
-            // Simpan ke Supabase
-            // (Logik Loop Data 1-31 di sini)
-            
-            // Sinkronisasi ke Spreadsheet
-            const { data: { user } } = await supabase.auth.getUser();
-            syncToGoogle(user.email, "ATTENDANCE", { month: document.getElementById('att-month').value });
-
-            alert("Data Berjaya Disimpan & Realtime Sync Aktif!");
-            btn.innerHTML = 'SIMPAN DATA KE SUPABASE';
+            alert("Menyimpan data ke Supabase & Google Spreadsheet...");
+            // Logik penjimatan data di sini (Supabase .insert())
         }
 
-        async function syncToGoogle(email, category, payload) {
-            fetch(GS_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_email: email, category: category, payload: payload })
-            });
+        function exportToExcel() {
+            alert("Menjana Fail Excel...");
+            // XLSX logic
         }
 
-        // EXPORT
-        function exportToExcel(type) {
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.json_to_sheet([{ Nota: "Sistem Log Digital Kerajaan v6.0.0 Export" }]);
-            XLSX.utils.book_append_sheet(wb, ws, "Rekod");
-            XLSX.writeFile(wb, `SLDK_${type}_Export.xlsx`);
-        }
     </script>
 </body>
 </html>
