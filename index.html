@@ -819,12 +819,7 @@
     let totalKosSemasa = 0;
 
     try {
-      if (SUPABASE_KEY !== 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNha2p0cXdub2JxenR6bnpoZHl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NjQ2NzQsImV4cCI6MjA5MzE0MDY3NH0.FGiOLDprt-cA_VM32YraV7FqaRpw90pxVljorz_bdoo') {
-        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      } else {
-        document.getElementById('setupNotice')?.classList.remove('hidden');
-        console.warn("Sila masukkan ANON KEY Supabase anda!");
-      }
+      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     } catch (e) {
       console.error("Supabase init error", e);
     }
