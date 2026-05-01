@@ -145,11 +145,7 @@
     </div>
 
     <script>
-        // --- CONFIGURATION ---
-        const SUPABASE_URL = "https://cakjtqwnobqztznzhdyt.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNha2p0cXdub2JxenR6bnpoZHl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NjQ2NzQsImV4cCI6MjA5MzE0MDY3NH0.FGiOLDprt-cA_VM32YraV7FqaRpw90pxVljorz_bdoo";
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+        
         let currentUser = null;
 
         // --- AUTH LOGIC ---
@@ -165,7 +161,10 @@
         }
 
         function loginGoogle() {
-  // Kod login Google Supabase di sini
+  // --- CONFIGURATION ---
+        const SUPABASE_URL = "https://cakjtqwnobqztznzhdyt.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNha2p0cXdub2JxenR6bnpoZHl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NjQ2NzQsImV4cCI6MjA5MzE0MDY3NH0.FGiOLDprt-cA_VM32YraV7FqaRpw90pxVljorz_bdoo";
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   console.log("Login Google dipanggil");
 }
 
