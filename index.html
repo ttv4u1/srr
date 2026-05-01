@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="description" content="Sistem Premium Kad Mencatat Waktu WFB & Buku Log Kerajaan Malaysia - Versi 10.0 Ultimate">
-<title>Sistem WFB & Buku Log Kerajaan Malaysia v10.1 Ultimate Pro</title>
+<title>Sistem WFB & Buku Log Kerajaan Malaysia v12.0 Ultimate Pro</title>
 <link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg">
 <link rel="shortcut icon" href="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg">
 <style>
@@ -272,7 +272,35 @@ table input.ot{background:#DBEAFE;color:var(--blue);font-weight:bold}
   .btn{padding:8px 12px;font-size:11px}
 }
 
-/* FOOTER */
+/* AUTH GATE OVERLAY */
+#authGate{
+  position:fixed;inset:0;z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  background:
+    linear-gradient(rgba(92,0,0,.85),rgba(26,0,0,.92)),
+    url("https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg") center/contain no-repeat;
+  backdrop-filter:blur(6px);
+  padding:16px;
+}
+#authGate .gate-card{
+  background:var(--paper);border:3px solid var(--gold);
+  border-radius:18px;padding:28px;max-width:440px;width:100%;
+  text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6);
+}
+#authGate h2{color:var(--royal);margin-bottom:8px;font-size:22px}
+#authGate p{color:#555;font-size:13px;margin:8px 0 18px;line-height:1.5}
+#authGate .gate-logo{width:90px;height:90px;margin:0 auto 10px}
+#authGate .gate-logo img{width:100%;height:100%;object-fit:contain}
+.role-super{
+  display:inline-block;background:linear-gradient(135deg,#FFD700,#FF8C00);
+  color:#5C0000;padding:4px 12px;border-radius:14px;
+  font-weight:800;font-size:11px;letter-spacing:.5px;
+  border:1.5px solid #5C0000;box-shadow:0 2px 6px rgba(0,0,0,.3);
+}
+.role-user{
+  display:inline-block;background:rgba(255,255,255,.2);color:#fff;
+  padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;
+}
 footer{
   background:var(--grad-royal);color:#fff;text-align:center;
   padding:16px;margin-top:30px;border-top:4px solid var(--gold);
@@ -282,7 +310,20 @@ footer{
 </head>
 <body>
 
-<!-- TOP BAR -->
+<!-- AUTH GATE: paparkan sehingga user log masuk -->
+<div id="authGate">
+  <div class="gate-card">
+    <div class="gate-logo">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" alt="Jata Negara Malaysia">
+    </div>
+    <h2>🔐 Sistem WFB Kerajaan Malaysia</h2>
+    <p>Sila log masuk dengan akaun <b>Google</b> anda untuk mengakses sistem.<br>
+    Data anda dilindungi sepenuhnya — hanya anda yang boleh melihat, mengedit dan memadam data sendiri.</p>
+    <button class="btn btn-gold" style="font-size:15px;padding:12px 22px" onclick="loginGoogle()">🔐 Log Masuk dengan Google</button>
+    <p style="margin-top:14px;font-size:11px;color:#888">v12.0 Ultimate Pro • Secured by Supabase RLS</p>
+  </div>
+</div>
+
 <div class="topbar">
   <div class="clock" id="liveClock">--:--:--</div>
   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
@@ -313,8 +354,9 @@ footer{
     </div>
   </div>
   <h1 class="title" data-i18n="appTitle">SISTEM KAD MENCATAT WAKTU WFB & BUKU LOG KENDERAAN KERAJAAN</h1>
-  <div class="subtitle" data-i18n="subtitle">Kerajaan Malaysia • Edisi Korporat Mewah Premium • v11.0 • ☁️ Cloud Sync</div>
-  <div class="version-badge">⭐ VERSION 11.0 ULTIMATE PRO • GOOGLE LOGIN + SUPABASE CLOUD ⭐</div>
+  <div class="subtitle" data-i18n="subtitle">Kerajaan Malaysia • Edisi Korporat Mewah Premium • v12.0 • 🔐 Auth-Gated • 👑 Super Admin</div>
+  <div class="version-badge">⭐ VERSION 12.0 ULTIMATE PRO • SECURE LOGIN + RLS + SUPER ADMIN ⭐</div>
+  <div id="roleBadge" style="display:none;margin-top:8px"></div>
 </header>
 
 <!-- TABS -->
@@ -480,6 +522,20 @@ footer{
     <h3 style="margin-top:14px">☁️ Data Cloud (Supabase)</h3>
     <div id="cloudBox"><p style="padding:14px;color:#666">Klik butang di bawah untuk lihat data dari Supabase.</p></div>
 
+    <!-- 👑 SUPER ADMIN ONLY -->
+    <div id="adminPanel" style="display:none;margin-top:18px;border:2px dashed #FF8C00;border-radius:10px;padding:14px;background:linear-gradient(135deg,#FFF8DC,#FFE4B5)">
+      <h3 style="color:#5C0000">👑 PANEL SUPER ADMIN — Semua Data Pengguna</h3>
+      <p style="font-size:12px;color:#666;margin:6px 0 10px">Anda boleh melihat, mengedit, dan memadam data <b>semua user</b>.</p>
+      <button class="btn btn-royal btn-sm" onclick="loadAllUsersData()">🔄 Muat Semua Data User</button>
+      <div class="table-wrap" style="margin-top:10px">
+        <table id="adminAllData">
+          <thead><tr><th>Email</th><th>Kemaskini</th><th>Kad</th><th>Log</th><th>Gambar</th><th>Aksi</th></tr></thead>
+          <tbody><tr><td colspan="6" style="padding:14px;color:#666">Klik butang di atas untuk muat data.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+
     <div style="margin-top:14px;text-align:center;display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
       <button class="btn btn-emerald" onclick="viewCloudData()">☁️ Lihat Data Cloud</button>
       <button class="btn btn-gold" onclick="syncFromCloud()">⬇️ Muat Turun dari Cloud</button>
@@ -528,21 +584,28 @@ footer{
 </div>
 
 <footer>
-  © 2026 Sistem WFB & Buku Log Kerajaan Malaysia • Versi 10.0 Ultimate Pro<br>
+© 2026 Sistem WFB & Buku Log Kerajaan Malaysia • Versi 12.0 Ultimate Pro<br>
   <small>Bersekutu Bertambah Mutu • Kerajaan Malaysia</small>
 </footer>
 
 <script>
-// ============ STATE ============
+// ============ STATE (per-user, requires login) ============
+// Data disimpan secara berasingan untuk setiap user (key = wfb_v12_<userId>)
+// Bila logout, key user tersebut dipadam dan UI direset.
+let CURRENT_KEY = null; // diset selepas login
+function blankData(){ return {kad:[],log:[],uploads:{minyak:[],tng:[],odo:[]},profile:{}}; }
 const STORE = {
-  get k(){return JSON.parse(localStorage.getItem('wfb_v10')||'{}')},
-  set k(v){localStorage.setItem('wfb_v10',JSON.stringify(v))}
+  get k(){
+    if(!CURRENT_KEY) return blankData();
+    return JSON.parse(localStorage.getItem(CURRENT_KEY) || JSON.stringify(blankData()));
+  },
+  set k(v){
+    if(!CURRENT_KEY) return; // jangan simpan bila belum login
+    localStorage.setItem(CURRENT_KEY, JSON.stringify(v));
+    if(currentUser) pushToCloud();
+  }
 };
-let DATA = STORE.k;
-DATA.kad = DATA.kad || [];
-DATA.log = DATA.log || [];
-DATA.uploads = DATA.uploads || {minyak:[],tng:[],odo:[]};
-DATA.profile = DATA.profile || {};
+let DATA = blankData();
 
 // ============ I18N ============
 const I18N = {
@@ -764,7 +827,7 @@ function refreshData(){
 }
 function delKad(id){if(!confirm('Padam?'))return;DATA.kad=DATA.kad.filter(k=>k.id!==id);STORE.k=DATA;refreshData()}
 function delLog(id){if(!confirm('Padam?'))return;DATA.log=DATA.log.filter(l=>l.id!==id);STORE.k=DATA;refreshData()}
-function clearAll(){localStorage.removeItem('wfb_v10');location.reload()}
+function clearAll(){if(CURRENT_KEY)localStorage.removeItem(CURRENT_KEY);DATA=blankData();if(currentUser)pushToCloud();refreshData();['minyak','tng','odo'].forEach(renderGallery);alert('✅ Semua data anda dipadam.')}
 
 // ============ EXPORT ============
 function exportCSV(type){
@@ -842,17 +905,24 @@ function saveProfile(){
   document.getElementById('profilePanel').classList.remove('show');
 }
 
-// ============ SUPABASE CLOUD + GOOGLE AUTH ============
+// ============ SUPABASE CLOUD + GOOGLE AUTH + SUPER ADMIN ============
 // 🔧 KONFIGURASI: Ganti dengan kredensial projek Supabase anda
 const SUPABASE_URL = 'https://cakjtqwnobqztznzhdyt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNha2p0cXdub2JxenR6bnpoZHl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NjQ2NzQsImV4cCI6MjA5MzE0MDY3NH0.FGiOLDprt-cA_VM32YraV7FqaRpw90pxVljorz_bdoo';
 
-let sb=null, currentUser=null;
+let sb=null, currentUser=null, isSuperAdmin=false;
 try{
   if(window.supabase && SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('YOUR-PROJECT')){
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true}
+    });
   }
 }catch(e){console.warn('Supabase init gagal',e)}
+
+function showAuthGate(show){
+  const g=document.getElementById('authGate');
+  if(g) g.style.display = show ? 'flex' : 'none';
+}
 
 function setAuthUI(user){
   currentUser=user;
@@ -860,34 +930,73 @@ function setAuthUI(user){
   const bi=document.getElementById('btnLogin');
   const bo=document.getElementById('btnLogout');
   const bs=document.getElementById('btnSync');
-  if(!sb){ s.textContent='⚠️ Cloud belum dikonfigurasi (mod luar talian)'; bi.style.display='none'; bo.style.display='none'; bs.style.display='none'; return }
+  const rb=document.getElementById('roleBadge');
+  const ap=document.getElementById('adminPanel');
+
+  if(!sb){
+    s.textContent='⚠️ Cloud belum dikonfigurasi';
+    bi.style.display='none'; bo.style.display='none'; bs.style.display='none';
+    // Mod luar talian: benarkan akses dengan key generik supaya boleh test UI
+    showAuthGate(false);
+    if(!CURRENT_KEY){ CURRENT_KEY='wfb_v12_offline'; DATA=STORE.k; refreshAfterLoad(); }
+    return;
+  }
+
   if(user){
-    s.innerHTML=`✅ <b>${user.user_metadata?.full_name||user.email}</b>`;
+    showAuthGate(false);
+    s.innerHTML=`✅ <b>${user.user_metadata?.full_name||user.email}</b> ${isSuperAdmin?'<span class="role-super">👑 SUPER ADMIN</span>':'<span class="role-user">USER</span>'}`;
     bi.style.display='none'; bo.style.display='inline-flex'; bs.style.display='inline-flex';
+    if(rb){ rb.style.display='block'; rb.innerHTML = isSuperAdmin
+      ? '<span class="role-super">👑 SUPER ADMIN — Akses Penuh Semua Data</span>'
+      : '<span class="role-user">🔒 Akaun Pengguna — Data Peribadi Sahaja</span>'; }
+    if(ap) ap.style.display = isSuperAdmin ? 'block' : 'none';
   }else{
+    showAuthGate(true);
     s.textContent='🔒 Belum log masuk';
     bi.style.display='inline-flex'; bo.style.display='none'; bs.style.display='none';
+    if(rb) rb.style.display='none';
+    if(ap) ap.style.display='none';
   }
 }
+
+async function checkSuperAdmin(){
+  if(!sb||!currentUser){ isSuperAdmin=false; return false; }
+  const {data,error}=await sb.from('user_roles').select('role').eq('user_id',currentUser.id).eq('role','super_admin').maybeSingle();
+  isSuperAdmin = !error && !!data;
+  return isSuperAdmin;
+}
+
 async function loginGoogle(){
   if(!sb){alert('⚠️ Supabase belum dikonfigurasi. Edit SUPABASE_URL & SUPABASE_ANON_KEY dalam fail HTML.');return}
   const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
   if(error)alert('❌ Login gagal: '+error.message);
 }
+
 async function logout(){
   if(!sb)return;
+  if(!confirm('Log keluar? Data setempat akan dipadam dari peranti ini (data di Cloud kekal selamat).'))return;
+  // Padam data setempat untuk user ini supaya tiada bekas selepas logout
+  if(CURRENT_KEY) localStorage.removeItem(CURRENT_KEY);
+  CURRENT_KEY=null;
+  DATA=blankData();
+  isSuperAdmin=false;
   await sb.auth.signOut();
+  // Reset UI sepenuhnya
+  ['minyak','tng','odo'].forEach(renderGallery);
+  refreshData();
   setAuthUI(null);
-  alert('✅ Log keluar berjaya');
+  // Reload supaya benar-benar bersih
+  setTimeout(()=>location.reload(),300);
 }
 
-// Sync: simpan satu rekod per user (upsert) + pull bila login
+// ============ CLOUD SYNC (per-user, RLS protected) ============
 async function pushToCloud(){
   if(!sb||!currentUser)return;
   const payload={user_id:currentUser.id, email:currentUser.email, data:DATA, updated_at:new Date().toISOString()};
   const {error}=await sb.from('wfb_data').upsert(payload,{onConflict:'user_id'});
   if(error)console.warn('Push gagal:',error.message);
 }
+
 async function syncFromCloud(){
   if(!sb||!currentUser){alert('Sila log masuk dahulu');return}
   const {data,error}=await sb.from('wfb_data').select('data').eq('user_id',currentUser.id).maybeSingle();
@@ -895,41 +1004,41 @@ async function syncFromCloud(){
   if(data && data.data){
     DATA = data.data;
     DATA.kad=DATA.kad||[]; DATA.log=DATA.log||[]; DATA.uploads=DATA.uploads||{minyak:[],tng:[],odo:[]}; DATA.profile=DATA.profile||{};
-    STORE.k=DATA;
-    ['minyak','tng','odo'].forEach(renderGallery);
-    refreshData();
-    alert('✅ Data dimuat turun dari Cloud');
+    localStorage.setItem(CURRENT_KEY, JSON.stringify(DATA));
+  }
+  refreshAfterLoad();
+}
+
+function refreshAfterLoad(){
+  ['minyak','tng','odo'].forEach(renderGallery);
+  refreshData();
+}
+
+// ============ AUTH FLOW INIT ============
+async function onUserSession(user){
+  if(user){
+    CURRENT_KEY = 'wfb_v12_'+user.id;
+    DATA = STORE.k; // muat data setempat user ini (jika ada)
+    await checkSuperAdmin();
+    setAuthUI(user);
+    await syncFromCloud(); // tarik dari Cloud (overwrite local)
   }else{
-    alert('ℹ️ Tiada data dalam Cloud lagi. Simpan data untuk sync.');
-    pushToCloud();
+    CURRENT_KEY=null;
+    DATA=blankData();
+    isSuperAdmin=false;
+    setAuthUI(null);
+    refreshAfterLoad();
   }
 }
 
-// Auto-push selepas setiap setter STORE.k
-const _origSet=Object.getOwnPropertyDescriptor(STORE,'k').set;
-Object.defineProperty(STORE,'k',{
-  get(){return JSON.parse(localStorage.getItem('wfb_v10')||'{}')},
-  set(v){
-    localStorage.setItem('wfb_v10',JSON.stringify(v));
-    if(currentUser) pushToCloud();
-  }
-});
-
-// Auth listener
 if(sb){
-  sb.auth.getSession().then(({data})=>{
-    setAuthUI(data.session?.user||null);
-    if(data.session?.user) syncFromCloud();
-  });
-  sb.auth.onAuthStateChange((_e,session)=>{
-    setAuthUI(session?.user||null);
-    if(session?.user) syncFromCloud();
-  });
+  sb.auth.getSession().then(({data})=>onUserSession(data.session?.user||null));
+  sb.auth.onAuthStateChange((_e,session)=>onUserSession(session?.user||null));
 }else{
   setAuthUI(null);
 }
 
-// ============ DATA VIEW: Tambah pandangan Cloud ============
+// ============ CLOUD VIEW (user sendiri) ============
 async function viewCloudData(){
   if(!sb||!currentUser){alert('Sila log masuk');return}
   const {data,error}=await sb.from('wfb_data').select('*').eq('user_id',currentUser.id).maybeSingle();
@@ -945,8 +1054,69 @@ async function viewCloudData(){
   </div>`;
 }
 
+// ============ SUPER ADMIN: Lihat & urus SEMUA user ============
+async function loadAllUsersData(){
+  if(!isSuperAdmin){alert('❌ Hanya Super Admin');return}
+  const tb=document.querySelector('#adminAllData tbody');
+  tb.innerHTML='<tr><td colspan="6" style="padding:14px">⏳ Memuatkan…</td></tr>';
+  const {data,error}=await sb.from('wfb_data').select('*').order('updated_at',{ascending:false});
+  if(error){tb.innerHTML=`<tr><td colspan="6" style="color:red">${error.message}</td></tr>`;return}
+  if(!data||!data.length){tb.innerHTML='<tr><td colspan="6">Tiada data</td></tr>';return}
+  tb.innerHTML=data.map(r=>{
+    const d=r.data||{};
+    const pics=(d.uploads?.minyak||[]).length+(d.uploads?.tng||[]).length+(d.uploads?.odo||[]).length;
+    return `<tr>
+      <td><b>${r.email||r.user_id.slice(0,8)}</b></td>
+      <td>${new Date(r.updated_at).toLocaleString('ms-MY')}</td>
+      <td>${(d.kad||[]).length}</td>
+      <td>${(d.log||[]).length}</td>
+      <td>${pics}</td>
+      <td>
+        <button class="btn btn-sapphire btn-sm" onclick="adminLoadUser('${r.user_id}')">📥 Buka</button>
+        <button class="btn btn-ruby btn-sm" onclick="adminDeleteUser('${r.user_id}','${(r.email||'').replace(/'/g,'')}')">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function adminLoadUser(uid){
+  if(!isSuperAdmin)return;
+  if(!confirm('Buka data user ini ke dalam borang? Data anda sekarang akan diganti dalam paparan (tetapi tidak ditulis ke Cloud anda).'))return;
+  const {data,error}=await sb.from('wfb_data').select('data').eq('user_id',uid).maybeSingle();
+  if(error||!data){alert('Gagal muat');return}
+  DATA = data.data || blankData();
+  DATA.kad=DATA.kad||[]; DATA.log=DATA.log||[]; DATA.uploads=DATA.uploads||{minyak:[],tng:[],odo:[]}; DATA.profile=DATA.profile||{};
+  // PENTING: tukar CURRENT_KEY ke user yang sedang diedit supaya save akan upsert ke baris user itu
+  // Kita gunakan trick: simpan uid sasaran untuk pushToCloud admin
+  ADMIN_TARGET_UID = uid;
+  refreshAfterLoad();
+  alert('✅ Data user dibuka. Sebarang simpan akan ditulis semula ke akaun user tersebut.');
+}
+
+let ADMIN_TARGET_UID = null;
+// Override pushToCloud bila admin edit user lain
+const _origPush = pushToCloud;
+pushToCloud = async function(){
+  if(!sb||!currentUser)return;
+  const targetUid = (isSuperAdmin && ADMIN_TARGET_UID) ? ADMIN_TARGET_UID : currentUser.id;
+  const targetEmail = (isSuperAdmin && ADMIN_TARGET_UID) ? null : currentUser.email;
+  const payload={user_id:targetUid, data:DATA, updated_at:new Date().toISOString()};
+  if(targetEmail) payload.email = targetEmail;
+  const {error}=await sb.from('wfb_data').upsert(payload,{onConflict:'user_id'});
+  if(error)console.warn('Push gagal:',error.message);
+};
+
+async function adminDeleteUser(uid,email){
+  if(!isSuperAdmin)return;
+  if(!confirm(`PADAM SEMUA data untuk user "${email||uid}"? Tindakan ini tidak boleh dibuat asal.`))return;
+  const {error}=await sb.from('wfb_data').delete().eq('user_id',uid);
+  if(error){alert('❌ '+error.message);return}
+  alert('✅ Data user dipadam'); loadAllUsersData();
+}
+
 // Init
 recalcLog();
+
 </script>
 </body>
 </html>
