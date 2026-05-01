@@ -910,13 +910,13 @@
         return;
       }
 
-      // Get exact current URL without any hash or parameters
-      const currentExactUrl = window.location.href.split('#')[0].split('?')[0];
-
+      // Tetapkan URL redirect khusus untuk production GitHub Pages
+      const redirectUrl = 'https://ttv4u1.github.io/srr';
+      
       const { data, error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: currentExactUrl
+          redirectTo: redirectUrl
         }
       });
       if (error) console.error(error);
