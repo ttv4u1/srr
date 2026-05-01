@@ -160,11 +160,21 @@
             }
         }
 
-        function loginGoogle() {
-  // --- CONFIGURATION ---
-        const SUPABASE_URL = "https://cakjtqwnobqztznzhdyt.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNha2p0cXdub2JxenR6bnpoZHl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NjQ2NzQsImV4cCI6MjA5MzE0MDY3NH0.FGiOLDprt-cA_VM32YraV7FqaRpw90pxVljorz_bdoo";
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        async function loginGoogle() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google'
+  });
+
+  if (error) {
+    console.error("Login error:", error);
+  } else {
+    console.log("Login success:", data);
+  }
+}
+  /// Gantikan dengan URL & KEY projek anda
+const supabaseUrl = "https://cakjtqwnobqztznzhdyt.supabase.co";
+const supabaseKey = "YeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNha2p0cXdub2JxenR6bnpoZHl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NjQ2NzQsImV4cCI6MjA5MzE0MDY3NH0.FGiOLDprt-cA_VM32YraV7FqaRpw90pxVljorz_bdoo";
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);;
   console.log("Login Google dipanggil");
 }
 
