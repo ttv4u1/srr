@@ -910,8 +910,9 @@
         return;
       }
 
-      // Tetapkan URL redirect khusus untuk production GitHub Pages
-      const redirectUrl = 'https://ttv4u1.github.io/srr';
+      // Gunakan local URL jika host di localhost/file://, sebaliknya guna GitHub Pages
+      const currentURL = window.location.href.split('#')[0].split('?')[0];
+      const redirectUrl = (currentURL.includes('file://') || currentURL.includes('http://localhost:3000')) ? currentURL : 'https://ttv4u1.github.io/srr';
       
       const { data, error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'google',
@@ -923,8 +924,23 @@
     });
 
     document.getElementById('btnLogout').addEventListener('click', async () => {
-      if (supabaseClient) await supabaseClient.auth.signOut();
-      window.location.reload();
+      const btn = document.getElementById('btnLogout');
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Log Keluar...';
+      
+      try {
+        if (supabaseClient) await supabaseClient.auth.signOut();
+      } catch (err) {
+        console.error("Ralat Log Keluar", err);
+      }
+      
+      // Totally logout: Bersihkan semua jejak sesi
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Muat semula ke URL bersih (tanpa token)
+      const cleanUrl = window.location.href.split('#')[0].split('?')[0];
+      window.location.replace(cleanUrl);
     });
 
     function bypassLogin() {
