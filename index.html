@@ -854,14 +854,47 @@
       }
     }
 
-    function saveTimeCard() {
-      // Dummy visual feedback
+    async function saveTimeCard() {
       const btn = document.querySelector('button[onclick="saveTimeCard()"]');
       const originalHtml = btn.innerHTML;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Disimpan';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Menyimpan...';
       btn.classList.add('bg-emerald-400');
+      btn.disabled = true;
       
       const tcBulan = document.getElementById('tcBulan').value;
+      
+      let dataHarian = [];
+      document.querySelectorAll('#tcBody1 tr, #tcBody2 tr').forEach(tr => {
+         let inputs = tr.querySelectorAll('input');
+         if(inputs.length === 6) {
+            dataHarian.push({
+               masuk1: inputs[0].value, keluar1: inputs[1].value,
+               masuk2: inputs[2].value, keluar2: inputs[3].value,
+               kenyataan: inputs[4].value, tt: inputs[5].value
+            });
+         }
+      });
+
+      if(supabaseClient && currentUser) {
+         const { error } = await supabaseClient.from('wfb_records').insert([{
+             user_id: currentUser.id,
+             nama: document.getElementById('tcNama').value,
+             jabatan: document.getElementById('tcJab').value,
+             bahagian: document.getElementById('tcBahagian').value,
+             bulan: tcBulan,
+             data_harian: dataHarian
+         }]);
+         
+         if(error) {
+            console.error(error);
+            alert("Ralat Supabase: " + error.message);
+            btn.innerHTML = originalHtml;
+            btn.classList.remove('bg-emerald-400');
+            btn.disabled = false;
+            return;
+         }
+      }
+
       const tbody = document.getElementById('dataTableBody');
       if(tbody.innerHTML.includes('Tiada data')) tbody.innerHTML = '';
       
@@ -879,6 +912,7 @@
       setTimeout(() => {
         btn.innerHTML = originalHtml;
         btn.classList.remove('bg-emerald-400');
+        btn.disabled = false;
         SoundFX.success();
         alert("Data Kad Waktu berjaya disimpan dan boleh disemak di Pangkalan Data!");
       }, 1000);
@@ -948,18 +982,14 @@
       document.getElementById('detailsModal').classList.add('hidden');
     }
 
-    function addLogEntry() {
+    async function addLogEntry() {
       const tarikh = document.getElementById('jlTarikh').value;
       const tujuan = document.getElementById('jlTujuan').value;
       const kosStr = document.getElementById('jlKos').value;
       const kos = parseFloat(kosStr) || 0;
       
-      // Removed strict validation to allow saving incomplete data
       const tarikhVal = tarikh || '-';
       const tujuanVal = tujuan || '-';
-
-      totalKosSemasa += kos;
-      document.getElementById('vlTotalKos').innerText = "RM " + totalKosSemasa.toFixed(2);
 
       const dataObj = {
         tarikh: tarikhVal,
@@ -977,6 +1007,39 @@
         pelulus: document.getElementById('jlPelulus').value,
         nota: document.getElementById('jlNota').value,
       };
+
+      if(supabaseClient && currentUser) {
+         const { error } = await supabaseClient.from('logbook_records').insert([{
+             user_id: currentUser.id,
+             bulan_rekod: document.getElementById('vlBulan').value,
+             no_plat: document.getElementById('vlPlat').value,
+             model_kereta: document.getElementById('vlModel').value,
+             bahagian_unit: document.getElementById('vlUnit').value,
+             tarikh: dataObj.tarikh !== '-' ? dataObj.tarikh : null,
+             masa_pergi: dataObj.masaPergi || null,
+             masa_balik: dataObj.masaBalik || null,
+             pemandu: dataObj.pemandu,
+             pengguna: dataObj.pengguna,
+             tujuan: dataObj.tujuan,
+             odo_awal: dataObj.odoAwal ? parseFloat(dataObj.odoAwal) : null,
+             odo_akhir: dataObj.odoAkhir ? parseFloat(dataObj.odoAkhir) : null,
+             jarak: dataObj.jarak ? parseFloat(dataObj.jarak) : null,
+             kos: dataObj.kos ? parseFloat(dataObj.kos) : null,
+             no_resit: dataObj.noResit,
+             liter: dataObj.liter ? parseFloat(dataObj.liter) : null,
+             pelulus: dataObj.pelulus,
+             nota: dataObj.nota
+         }]);
+         
+         if(error) {
+            console.error(error);
+            alert("Ralat Supabase: " + error.message);
+            return;
+         }
+      }
+
+      totalKosSemasa += kos;
+      document.getElementById('vlTotalKos').innerText = "RM " + totalKosSemasa.toFixed(2);
 
       const base64Data = btoa(unescape(encodeURIComponent(JSON.stringify(dataObj))));
 
