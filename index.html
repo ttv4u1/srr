@@ -1,309 +1,1719 @@
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="ms-MY">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem WFB & Log Perjalanan Premium Malaysia v3.1.3</title>
-    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg">
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>Sistem Kad Mencatat Waktu & Log Perjalanan Kenderaan v2.0.0</title>
+    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23003DA5' width='50' height='100'/><rect fill='%23FCD116' x='50' width='50' height='100'/><circle cx='25' cy='50' r='20' fill='%23FFCC00'/><path d='M50 20 L55 35 L70 35 L58 45 L63 60 L50 50 L37 60 L42 45 L30 35 L45 35 Z' fill='%23FFF'/></svg>">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)), 
-                        url('https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg');
-            background-size: 50%; background-repeat: no-repeat; background-position: center;
-            background-attachment: fixed; color: #ffffff;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .glass-panel { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 16px; }
-        .input-premium { background: rgba(255, 255, 255, 0.95); color: #1a1a1a; border-radius: 8px; padding: 10px 14px; width: 100%; border: none; font-weight: 600; }
-        .red-alert { background: #ff4d4d !important; color: white !important; animation: blink 1.5s infinite; }
-        @keyframes blink { 50% { opacity: 0.7; } }
-        .btn-realistic { transition: all 0.2s; box-shadow: 0 4px 0 rgba(0,0,0,0.4); cursor: pointer; }
-        .btn-realistic:active { transform: translateY(2px); box-shadow: none; }
-        #auth-overlay { position: fixed; inset: 0; background: #0b0e14; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        .hidden { display: none !important; }
-        input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0); }
+
+        :root {
+            --primary: #003DA5;
+            --secondary: #FCD116;
+            --accent: #FF6B35;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --border-radius: 8px;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            background-attachment: fixed;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Section */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #0056b3 100%);
+            color: white;
+            padding: 30px 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400"><defs><pattern id="pattern" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse"><rect fill="rgba(255,255,255,0.02)" width="200" height="200"/><path fill="rgba(255,255,255,0.05)" d="M0,100 Q50,50 100,100 T200,100"/></pattern></defs><rect width="1200" height="400" fill="url(%23pattern)"/></svg>');
+            pointer-events: none;
+        }
+
+        .header-content {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .header-text h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .header-text p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .clock-widget {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 25px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            text-align: right;
+            min-width: 200px;
+        }
+
+        .clock-time {
+            font-size: 24px;
+            font-weight: bold;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .clock-date {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        /* Navigation */
+        nav.main-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 61, 165, 0.3);
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 61, 165, 0.1);
+            background: #f0f6ff;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #0056b3 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 61, 165, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            background: #e6b800;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(252, 209, 22, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: var(--dark);
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Table Styles */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--primary) 0%, #0056b3 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        tbody tr {
+            transition: var(--transition);
+        }
+
+        tbody tr:hover {
+            background: #f8f9ff;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f5f7fa;
+        }
+
+        .table-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-ot {
+            background: #ffe0e0;
+            color: var(--danger);
+        }
+
+        .badge-normal {
+            background: #e0ffe0;
+            color: var(--success);
+        }
+
+        .badge-late {
+            background: #ffe0b0;
+            color: #ff6b00;
+        }
+
+        /* Time Card Section */
+        .time-card-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1200px) {
+            .time-card-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .time-card-section {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .time-card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #0056b3 100%);
+            color: white;
+            padding: 20px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .time-card-content {
+            padding: 20px;
+        }
+
+        /* Upload Section */
+        .upload-zone {
+            border: 3px dashed var(--primary);
+            border-radius: var(--border-radius);
+            padding: 40px 20px;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+            background: #f8f9ff;
+        }
+
+        .upload-zone:hover {
+            background: #eef2ff;
+            border-color: #0056b3;
+        }
+
+        .upload-zone.dragover {
+            background: #e0ebff;
+            border-color: var(--accent);
+        }
+
+        .upload-zone-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .upload-zone-text {
+            margin-bottom: 10px;
+        }
+
+        .upload-zone-text strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .upload-zone-text small {
+            color: #666;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* Gallery/Media Section */
+        .media-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .media-item {
+            position: relative;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            background: #f5f5f5;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .media-item:hover {
+            transform: scale(1.05);
+        }
+
+        .media-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .media-item-delete {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            transition: var(--transition);
+        }
+
+        .media-item-delete:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: auto;
+            padding: 30px;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            border-left: 4px solid;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-color: var(--success);
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: var(--danger);
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-color: var(--warning);
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-color: #bee5eb;
+        }
+
+        /* Language Toggle */
+        .lang-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+            z-index: 500;
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        .lang-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Profile Autohide */
+        .profile-widget {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            z-index: 499;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: var(--transition);
+            max-width: 250px;
+        }
+
+        .profile-widget.hidden {
+            transform: translateX(calc(100% + 20px));
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .profile-info small {
+            display: block;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .profile-info strong {
+            color: var(--primary);
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+
+            .main-nav, .lang-toggle, .profile-widget, .btn-group {
+                display: none;
+            }
+
+            .card {
+                page-break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            header {
+                padding: 20px 15px;
+            }
+
+            .header-content {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .clock-widget {
+                text-align: center;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav.main-nav {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+            }
+        }
+
+        /* Status Indicators */
+        .status-badge {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-badge.online {
+            background: var(--success);
+        }
+
+        .status-badge.offline {
+            background: #999;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Late Time Highlight */
+        .time-late {
+            background: #ffe0e0;
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .time-ot {
+            background: #fff3cd;
+            color: #856404;
+            font-weight: 600;
+        }
+
+        /* Vehicle Log Specific */
+        .odometer-calculation {
+            background: #eef2ff;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 4px solid var(--primary);
+        }
+
+        .odometer-calculation strong {
+            color: var(--primary);
+        }
+
+        .cost-summary {
+            background: linear-gradient(135deg, #e0ffe0 0%, #d4edda 100%);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            border: 2px solid var(--success);
+        }
+
+        .cost-summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .cost-summary-item strong {
+            color: var(--primary);
+        }
+
+        .cost-summary-total {
+            border-top: 2px solid var(--success);
+            padding-top: 12px;
+            margin-top: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
-<body class="p-2 md:p-6">
-
-    <!-- LOGIN OVERLAY -->
-    <div id="auth-overlay">
-        <div class="glass-panel p-10 text-center max-w-md w-full mx-4 border-yellow-500/50">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" class="h-28 mx-auto mb-6">
-            <h1 class="text-2xl font-black mb-2 text-yellow-500 tracking-tighter">LOG MASUK KORPORAT</h1>
-            <p class="text-gray-400 mb-8 text-sm uppercase tracking-widest font-semibold">Sistem Rekod Digital v3.1.3</p>
-            
-            <button id="loginBtn" onclick="loginGoogle()" class="bg-white text-black px-6 py-4 rounded-xl font-bold flex items-center justify-center gap-3 w-full hover:bg-gray-200 transition btn-realistic">
-                <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="h-6">
-                Log Masuk dengan Google
-            </button>
-            <p id="auth-status" class="mt-4 text-xs text-blue-400 hidden italic">Menghubungi pelayan...</p>
+<body>
+    <!-- Profile Widget -->
+    <div class="profile-widget" id="profileWidget">
+        <div class="profile-avatar" id="profileAvatar">TT</div>
+        <div class="profile-info">
+            <strong id="profileName">Pengguna</strong>
+            <small id="profileDept">Jabatan</small>
         </div>
     </div>
 
-    <!-- MAIN APP -->
-    <div id="main-app" class="hidden max-w-7xl mx-auto">
-        <header class="glass-panel p-6 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-4">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" class="h-16 md:h-20">
-                <div>
-                    <h1 class="text-xl md:text-3xl font-black text-yellow-400 uppercase leading-none">Sistem Data Premium</h1>
-                    <p id="clock" class="text-xs font-mono text-gray-300 mt-2 bg-black/30 p-1 rounded inline-block"></p>
+    <!-- Language Toggle -->
+    <button class="lang-toggle" id="langToggle" title="Tukar Bahasa / Change Language">EN / MS</button>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-content">
+                <div class="logo-group">
+                    <div class="logo" title="Jata Negara Malaysia">🇲🇾</div>
+                    <div class="logo" title="Logo Jabatan">🏛️</div>
+                    <div class="logo" title="Logo Penguatkuasaan">⚖️</div>
                 </div>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="text-right">
-                    <p id="user-email" class="text-sm font-bold text-blue-400"></p>
-                    <button onclick="logout()" class="text-[10px] bg-red-600/20 text-red-400 px-2 py-1 rounded hover:bg-red-600 hover:text-white transition">LOG KELUAR</button>
+                <div class="header-text">
+                    <h1 data-ms="Sistem Kad Mencatat Waktu & Log Perjalanan Kenderaan" data-en="Time Card & Vehicle Log Management System"></h1>
+                    <p data-ms="Versi 2.0.0 Premium - Sistem Pengurusan Waktu dan Perjalanan Kenderaan" data-en="Version 2.0.0 Premium - Professional Time & Vehicle Management"></p>
                 </div>
-                <div id="user-avatar" class="h-12 w-12 rounded-full border-2 border-yellow-500 bg-gray-700 overflow-hidden shadow-lg shadow-yellow-500/20"></div>
+                <div class="clock-widget">
+                    <div class="clock-time" id="clockTime">00:00:00</div>
+                    <div class="clock-date" id="clockDate">Isnin, 1 Mei 2026</div>
+                </div>
             </div>
         </header>
 
-        <!-- PROFILE SECTION -->
-        <section class="glass-panel p-6 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div><label class="text-[10px] text-yellow-500 font-bold block mb-1 uppercase">Nama Pegawai</label><input type="text" id="p_nama" class="input-premium"></div>
-                <div><label class="text-[10px] text-yellow-500 font-bold block mb-1 uppercase">Kem./Jabatan</label><input type="text" id="p_jab" class="input-premium"></div>
-                <div><label class="text-[10px] text-yellow-500 font-bold block mb-1 uppercase">Bahagian</label><input type="text" id="p_bah" class="input-premium"></div>
-                <div><label class="text-[10px] text-yellow-500 font-bold block mb-1 uppercase">Bulan Rekod</label><input type="month" id="p_bulan" class="input-premium"></div>
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <button class="nav-btn active" onclick="switchSection('timecard')"
+                    data-ms="Kad Mencatat Waktu" data-en="Time Card"></button>
+            <button class="nav-btn" onclick="switchSection('vehiclelog')"
+                    data-ms="Log Perjalanan" data-en="Vehicle Log"></button>
+            <button class="nav-btn" onclick="switchSection('uploads')"
+                    data-ms="Muatan Naik" data-en="Uploads"></button>
+            <button class="nav-btn" onclick="switchSection('reports')"
+                    data-ms="Laporan & Data" data-en="Reports & Data"></button>
+            <button class="nav-btn" onclick="switchSection('settings')"
+                    data-ms="Tetapan" data-en="Settings"></button>
+        </nav>
+
+        <!-- TIME CARD SECTION -->
+        <section id="timecard" class="content-section active">
+            <div class="time-card-container">
+                <!-- Card Side A (1-15) -->
+                <div class="time-card-section">
+                    <div class="time-card-header">📋 <span data-ms="Muka A (Hari 1-15)" data-en="Side A (Days 1-15)"></span></div>
+                    <div class="time-card-content">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label data-ms="Nama" data-en="Name"></label>
+                                <input type="text" id="cardA_name" placeholder="Nama Penuh / Full Name">
+                            </div>
+                            <div class="form-group">
+                                <label data-ms="Cawangan/Jabatan" data-en="Branch/Department"></label>
+                                <input type="text" id="cardA_dept" placeholder="Cawangan/Jabatan">
+                            </div>
+                            <div class="form-group">
+                                <label data-ms="Bahagian/Seksyen" data-en="Division/Section"></label>
+                                <input type="text" id="cardA_section" placeholder="Bahagian/Seksyen">
+                            </div>
+                            <div class="form-group">
+                                <label data-ms="Bulan" data-en="Month"></label>
+                                <input type="month" id="cardA_month">
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table id="tableCardA">
+                                <thead>
+                                    <tr>
+                                        <th data-ms="Bil" data-en="No"></th>
+                                        <th data-ms="Tarikh" data-en="Date"></th>
+                                        <th data-ms="Masuk 1" data-en="In 1"></th>
+                                        <th data-ms="Keluar 1" data-en="Out 1"></th>
+                                        <th data-ms="Masuk 2" data-en="In 2"></th>
+                                        <th data-ms="Keluar 2" data-en="Out 2"></th>
+                                        <th data-ms="Kenyataan" data-en="Remarks"></th>
+                                        <th data-ms="T/T" data-en="OT"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bodyCardA"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="btn-group" style="margin-top: 15px;">
+                            <button class="btn btn-success" onclick="generateCardA()" data-ms="Jana Jadual" data-en="Generate Table"></button>
+                            <button class="btn btn-primary" onclick="printCardA()" data-ms="Cetak" data-en="Print"></button>
+                            <button class="btn btn-secondary" onclick="exportCardA()" data-ms="Eksport" data-en="Export"></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Side B (16-31) -->
+                <div class="time-card-section">
+                    <div class="time-card-header">📋 <span data-ms="Muka B (Hari 16-31)" data-en="Side B (Days 16-31)"></span></div>
+                    <div class="time-card-content">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label data-ms="Nama" data-en="Name"></label>
+                                <input type="text" id="cardB_name" placeholder="Nama Penuh / Full Name">
+                            </div>
+                            <div class="form-group">
+                                <label data-ms="Cawangan/Jabatan" data-en="Branch/Department"></label>
+                                <input type="text" id="cardB_dept" placeholder="Cawangan/Jabatan">
+                            </div>
+                            <div class="form-group">
+                                <label data-ms="Bahagian/Seksyen" data-en="Division/Section"></label>
+                                <input type="text" id="cardB_section" placeholder="Bahagian/Seksyen">
+                            </div>
+                            <div class="form-group">
+                                <label data-ms="Bulan" data-en="Month"></label>
+                                <input type="month" id="cardB_month">
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table id="tableCardB">
+                                <thead>
+                                    <tr>
+                                        <th data-ms="Bil" data-en="No"></th>
+                                        <th data-ms="Tarikh" data-en="Date"></th>
+                                        <th data-ms="Masuk 1" data-en="In 1"></th>
+                                        <th data-ms="Keluar 1" data-en="Out 1"></th>
+                                        <th data-ms="Masuk 2" data-en="In 2"></th>
+                                        <th data-ms="Keluar 2" data-en="Out 2"></th>
+                                        <th data-ms="Kenyataan" data-en="Remarks"></th>
+                                        <th data-ms="T/T" data-en="OT"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bodyCardB"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="btn-group" style="margin-top: 15px;">
+                            <button class="btn btn-success" onclick="generateCardB()" data-ms="Jana Jadual" data-en="Generate Table"></button>
+                            <button class="btn btn-primary" onclick="printCardB()" data-ms="Cetak" data-en="Print"></button>
+                            <button class="btn btn-secondary" onclick="exportCardB()" data-ms="Eksport" data-en="Export"></button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- TABLES -->
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
-            <div class="glass-panel p-4 overflow-x-auto border-t-4 border-blue-500">
-                <h3 class="font-bold text-blue-400 mb-3 flex items-center gap-2"><i class="fas fa-calendar-alt"></i> JADUAL KEHADIRAN (1-15hb)</h3>
-                <table class="w-full text-[11px]" id="table-wfb-a">
-                    <thead><tr class="bg-blue-900/50 text-left"><th class="p-2">TARIKH</th><th class="p-2">MASUK</th><th class="p-2">KELUAR</th><th class="p-2">MASUK</th><th class="p-2">KELUAR</th><th class="p-2">NOTA</th></tr></thead>
-                    <tbody id="wfb-a-body"></tbody>
-                </table>
+        <!-- VEHICLE LOG SECTION -->
+        <section id="vehiclelog" class="content-section">
+            <div class="card">
+                <div class="card-title">🚗 <span data-ms="Maklumat Kenderaan" data-en="Vehicle Information"></span></div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label data-ms="Bulan Rekod" data-en="Record Month"></label>
+                        <input type="month" id="vehicleMonth">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="No. Pendaftaran Kereta" data-en="Vehicle Registration No."></label>
+                        <input type="text" id="vehicleReg" placeholder="e.g., WLU 123">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Model Kereta" data-en="Vehicle Model"></label>
+                        <input type="text" id="vehicleModel" placeholder="e.g., Perodua Myvi">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Odo Permulaan (KM)" data-en="Starting Odometer (KM)"></label>
+                        <input type="number" id="vehicleStartOdo" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Bahagian/Unit" data-en="Division/Unit"></label>
+                        <input type="text" id="vehicleUnit" placeholder="Bahagian/Unit">
+                    </div>
+                </div>
             </div>
-            <div class="glass-panel p-4 overflow-x-auto border-t-4 border-green-500">
-                <h3 class="font-bold text-green-400 mb-3 flex items-center gap-2"><i class="fas fa-calendar-check"></i> JADUAL KEHADIRAN (16-31hb)</h3>
-                <table class="w-full text-[11px]" id="table-wfb-b">
-                    <thead><tr class="bg-green-900/50 text-left"><th class="p-2">TARIKH</th><th class="p-2">MASUK</th><th class="p-2">KELUAR</th><th class="p-2">MASUK</th><th class="p-2">KELUAR</th><th class="p-2">NOTA</th></tr></thead>
-                    <tbody id="wfb-b-body"></tbody>
-                </table>
-            </div>
-        </div>
 
-        <!-- LOG KENDERAAN -->
-        <section class="glass-panel p-6 mb-6 border-t-4 border-yellow-500">
-            <h2 class="font-bold text-yellow-500 mb-5 flex items-center gap-2 text-lg"><i class="fas fa-car-side"></i> LOG PERJALANAN KENDERAAN</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                <div><label class="text-[10px] text-gray-400 font-bold">NO. PLAT</label><input type="text" id="v_plat" class="input-premium"></div>
-                <div><label class="text-[10px] text-gray-400 font-bold">MODEL</label><input type="text" id="v_model" class="input-premium"></div>
-                <div><label class="text-[10px] text-gray-400 font-bold">ODO MULA</label><input type="number" id="v_odo" class="input-premium" oninput="recalcLogs()"></div>
-                <div class="flex items-end"><button onclick="addLogRow()" class="bg-blue-600 hover:bg-blue-500 w-full py-2.5 rounded-lg font-bold text-xs btn-realistic">+ BARIS BARU</button></div>
+            <div class="card">
+                <div class="card-title">📝 <span data-ms="Tambah Rekod Perjalanan Baru" data-en="Add New Travel Record"></span></div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label data-ms="Tarikh" data-en="Date"></label>
+                        <input type="date" id="travelDate" value="2026-05-01">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Masa Pergi (12 jam)" data-en="Departure Time (12H)"></label>
+                        <input type="time" id="travelTimeOut">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Masa Balik (12 jam)" data-en="Return Time (12H)"></label>
+                        <input type="time" id="travelTimeIn">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Pemandu" data-en="Driver"></label>
+                        <input type="text" id="travelDriver" placeholder="Nama Pemandu">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Tujuan & Lokasi Penuh" data-en="Purpose & Full Location"></label>
+                        <input type="text" id="travelPurpose" placeholder="Tujuan perjalanan">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Pelulus (Kelulusan)" data-en="Approval"></label>
+                        <input type="text" id="travelApproval" placeholder="Nama Pelulus">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Pengguna (Nama Pemohon)" data-en="User (Requester)"></label>
+                        <input type="text" id="travelUser" placeholder="Nama Pemohon">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Odo Awal (KM)" data-en="Starting Odometer (KM)"></label>
+                        <input type="number" id="travelOdoStart" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Odo Akhir (KM)" data-en="Ending Odometer (KM)"></label>
+                        <input type="number" id="travelOdoEnd" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Jarak (KM) - Otomatis" data-en="Distance (KM) - Auto"></label>
+                        <input type="number" id="travelDistance" placeholder="0" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Kos & Resit (RM)" data-en="Cost & Receipt (RM)"></label>
+                        <input type="number" id="travelCost" placeholder="0" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="No. Resit (Pilihan)" data-en="Receipt No. (Optional)"></label>
+                        <input type="text" id="travelReceiptNo" placeholder="e.g., RCP-001">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Liter (Liter Bahan Api)" data-en="Liters (Fuel Liters)"></label>
+                        <input type="number" id="travelLiters" placeholder="0" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Nota" data-en="Notes"></label>
+                        <textarea id="travelNotes" placeholder="Nota tambahan..."></textarea>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-success" onclick="addTravelRecord()" data-ms="Tambah Rekod" data-en="Add Record"></button>
+                    <button class="btn btn-danger" onclick="clearTravelForm()" data-ms="Kosongkan" data-en="Clear"></button>
+                </div>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-[11px] min-w-[900px]">
-                    <thead class="bg-gray-800">
-                        <tr><th class="p-3">TARIKH</th><th class="p-3">MASA</th><th class="p-3">PEMANDU</th><th class="p-3">DESTINASI/TUJUAN</th><th class="p-3">ODO AKHIR</th><th class="p-3">JARAK</th><th class="p-3">KOS (RM)</th><th class="p-3">LITER</th></tr>
-                    </thead>
-                    <tbody id="log-body"></tbody>
-                </table>
+
+            <div class="card">
+                <div class="card-title">📊 <span data-ms="Senarai Rekod Perjalanan" data-en="Travel Records List"></span></div>
+                <div class="table-responsive">
+                    <table id="travelTable">
+                        <thead>
+                            <tr>
+                                <th data-ms="Bil" data-en="No"></th>
+                                <th data-ms="Tarikh" data-en="Date"></th>
+                                <th data-ms="Masa Pergi" data-en="Departure"></th>
+                                <th data-ms="Masa Balik" data-en="Return"></th>
+                                <th data-ms="Pemandu" data-en="Driver"></th>
+                                <th data-ms="Tujuan" data-en="Purpose"></th>
+                                <th data-ms="Odo Awal" data-en="Start ODO"></th>
+                                <th data-ms="Odo Akhir" data-en="End ODO"></th>
+                                <th data-ms="Jarak (KM)" data-en="Distance (KM)"></th>
+                                <th data-ms="Kos (RM)" data-en="Cost (RM)"></th>
+                                <th data-ms="Liter" data-en="Liters"></th>
+                                <th data-ms="Aksi" data-en="Action"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="travelTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="cost-summary">
+                    <div class="cost-summary-item">
+                        <span data-ms="Jumlah Jarak" data-en="Total Distance"></span>
+                        <strong id="totalDistance">0 KM</strong>
+                    </div>
+                    <div class="cost-summary-item">
+                        <span data-ms="Jumlah Bahan Api" data-en="Total Fuel"></span>
+                        <strong id="totalLiters">0 Liter</strong>
+                    </div>
+                    <div class="cost-summary-item">
+                        <span data-ms="Jumlah Keseluruhan Kos" data-en="Total Cost"></span>
+                        <strong id="totalCost">RM 0.00</strong>
+                    </div>
+                    <div class="cost-summary-total">
+                        <span data-ms="Jumlah Akhir (RM)" data-en="Final Total (RM)"></span>: <span id="grandTotal">RM 0.00</span>
+                    </div>
+                </div>
+
+                <div class="btn-group" style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="printVehicleLog()" data-ms="Cetak Log Kenderaan" data-en="Print Vehicle Log"></button>
+                    <button class="btn btn-secondary" onclick="exportVehicleLog('csv')" data-ms="Eksport CSV" data-en="Export CSV"></button>
+                    <button class="btn btn-secondary" onclick="exportVehicleLog('excel')" data-ms="Eksport Excel" data-en="Export Excel"></button>
+                    <button class="btn btn-secondary" onclick="exportVehicleLog('access')" data-ms="Eksport Access DB" data-en="Export Access DB"></button>
+                </div>
             </div>
         </section>
 
-        <!-- ACTION BUTTONS -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-20">
-            <button onclick="syncToCloud()" id="btnSync" class="bg-emerald-600 hover:bg-emerald-500 py-5 rounded-2xl font-black text-lg btn-realistic flex items-center justify-center gap-3">
-                <i class="fas fa-cloud-upload-alt text-2xl"></i> SIMPAN KE CLOUD
-            </button>
-            <button onclick="window.print()" class="bg-gray-700 hover:bg-gray-600 py-5 rounded-2xl font-black text-lg btn-realistic flex items-center justify-center gap-3">
-                <i class="fas fa-print text-2xl"></i> CETAK / PDF
-            </button>
-            <button onclick="exportCSV()" class="bg-blue-700 hover:bg-blue-600 py-5 rounded-2xl font-black text-lg btn-realistic flex items-center justify-center gap-3">
-                <i class="fas fa-file-csv text-2xl"></i> EXPORT EXCEL
-            </button>
-        </div>
+        <!-- UPLOADS SECTION -->
+        <section id="uploads" class="content-section">
+            <div class="card">
+                <div class="card-title">📤 <span data-ms="Muatan Naik Resit & Dokumen" data-en="Upload Receipts & Documents"></span></div>
+                
+                <div style="margin-bottom: 30px;">
+                    <h3 data-ms="Resit Minyak" data-en="Fuel Receipt"></h3>
+                    <div class="upload-zone" id="fuelReceiptZone" ondrop="handleDrop(event, 'fuelReceipt')" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" onclick="document.getElementById('fuelReceiptInput').click()">
+                        <div class="upload-zone-icon">⛽</div>
+                        <div class="upload-zone-text">
+                            <strong data-ms="Seret & Lepas Resit Minyak" data-en="Drag & Drop Fuel Receipt"></strong>
+                            <small data-ms="atau klik untuk pilih fail" data-en="or click to select file"></small>
+                        </div>
+                    </div>
+                    <input type="file" id="fuelReceiptInput" accept="image/*,application/pdf" onchange="handleFileSelect(event, 'fuelReceipt')" style="display: none;">
+                    <div class="media-gallery" id="fuelReceiptGallery"></div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h3 data-ms="Resit TNG / Tol" data-en="TNG / Toll Receipt"></h3>
+                    <div class="upload-zone" id="tngReceiptZone" ondrop="handleDrop(event, 'tngReceipt')" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" onclick="document.getElementById('tngReceiptInput').click()">
+                        <div class="upload-zone-icon">🛣️</div>
+                        <div class="upload-zone-text">
+                            <strong data-ms="Seret & Lepas Resit TNG" data-en="Drag & Drop TNG Receipt"></strong>
+                            <small data-ms="atau klik untuk pilih fail" data-en="or click to select file"></small>
+                        </div>
+                    </div>
+                    <input type="file" id="tngReceiptInput" accept="image/*,application/pdf" onchange="handleFileSelect(event, 'tngReceipt')" style="display: none;">
+                    <div class="media-gallery" id="tngReceiptGallery"></div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h3 data-ms="Gambar Odometer" data-en="Odometer Images"></h3>
+                    <div class="upload-zone" id="odometerZone" ondrop="handleDrop(event, 'odometer')" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" onclick="document.getElementById('odometerInput').click()">
+                        <div class="upload-zone-icon">📷</div>
+                        <div class="upload-zone-text">
+                            <strong data-ms="Seret & Lepas Gambar Odometer" data-en="Drag & Drop Odometer Images"></strong>
+                            <small data-ms="atau klik untuk pilih fail" data-en="or click to select file"></small>
+                        </div>
+                    </div>
+                    <input type="file" id="odometerInput" accept="image/*" multiple onchange="handleFileSelect(event, 'odometer')" style="display: none;">
+                    <div class="media-gallery" id="odometerGallery"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- REPORTS SECTION -->
+        <section id="reports" class="content-section">
+            <div class="card">
+                <div class="card-title">📊 <span data-ms="Laporan Ringkasan" data-en="Summary Reports"></span></div>
+                
+                <div style="margin-bottom: 30px;">
+                    <h3 data-ms="Data Kad Mencatat Waktu" data-en="Time Card Data"></h3>
+                    <div class="table-responsive">
+                        <table id="reportTimeCardTable">
+                            <thead>
+                                <tr>
+                                    <th data-ms="Nama" data-en="Name"></th>
+                                    <th data-ms="Jabatan" data-en="Department"></th>
+                                    <th data-ms="Bulan" data-en="Month"></th>
+                                    <th data-ms="Jumlah Hari" data-en="Total Days"></th>
+                                    <th data-ms="Aksi" data-en="Action"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportTimeCardBody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: #999;" data-ms="Tiada data" data-en="No data"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h3 data-ms="Data Log Perjalanan" data-en="Vehicle Log Data"></h3>
+                    <div class="table-responsive">
+                        <table id="reportVehicleTable">
+                            <thead>
+                                <tr>
+                                    <th data-ms="Tarikh" data-en="Date"></th>
+                                    <th data-ms="No. Pendaftaran" data-en="Registration No."></th>
+                                    <th data-ms="Tujuan" data-en="Purpose"></th>
+                                    <th data-ms="Jarak (KM)" data-en="Distance (KM)"></th>
+                                    <th data-ms="Kos (RM)" data-en="Cost (RM)"></th>
+                                    <th data-ms="Aksi" data-en="Action"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportVehicleBody">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; color: #999;" data-ms="Tiada data" data-en="No data"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h3 data-ms="Data Muatan Naik" data-en="Uploaded Files"></h3>
+                    <div class="table-responsive">
+                        <table id="reportUploadsTable">
+                            <thead>
+                                <tr>
+                                    <th data-ms="Jenis" data-en="Type"></th>
+                                    <th data-ms="Jumlah Fail" data-en="File Count"></th>
+                                    <th data-ms="Tarikh Muatan" data-en="Upload Date"></th>
+                                    <th data-ms="Aksi" data-en="Action"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportUploadsBody">
+                                <tr>
+                                    <td colspan="4" style="text-align: center; color: #999;" data-ms="Tiada data" data-en="No data"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SETTINGS SECTION -->
+        <section id="settings" class="content-section">
+            <div class="card">
+                <div class="card-title">⚙️ <span data-ms="Tetapan Profil" data-en="Profile Settings"></span></div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label data-ms="Nama Pengguna" data-en="User Name"></label>
+                        <input type="text" id="settingName" placeholder="Nama Penuh">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Jabatan/Cawangan" data-en="Department/Branch"></label>
+                        <input type="text" id="settingDept" placeholder="Jabatan">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Bahagian/Seksyen" data-en="Division/Section"></label>
+                        <input type="text" id="settingSection" placeholder="Bahagian">
+                    </div>
+                    <div class="form-group">
+                        <label data-ms="Emel" data-en="Email"></label>
+                        <input type="email" id="settingEmail" placeholder="emel@example.com">
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-success" onclick="saveSettings()" data-ms="Simpan Tetapan" data-en="Save Settings"></button>
+                    <button class="btn btn-danger" onclick="clearAllData()" data-ms="Kosongkan Semua Data" data-en="Clear All Data"></button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">ℹ️ <span data-ms="Maklumat Sistem" data-en="System Information"></span></div>
+                <div style="padding: 15px; background: #f8f9ff; border-radius: 6px;">
+                    <p><strong data-ms="Versi" data-en="Version"></strong>: v2.0.0 Premium</p>
+                    <p><strong data-ms="Tarikh Rilis" data-en="Release Date"></strong>: 1 Mei 2026</p>
+                    <p><strong data-ms="Bahasa" data-en="Languages"></strong>: <span data-ms="Bahasa Melayu & Inggeris Amerika" data-en="Malay & American English"></span></p>
+                    <p><strong data-ms="Kompatibiliti" data-en="Compatibility"></strong>: <span data-ms="Windows, macOS, Linux, iOS, Android" data-en="Windows, macOS, Linux, iOS, Android"></span></p>
+                    <p><strong data-ms="Penyokong Format" data-en="Supported Formats"></strong>: CSV, Excel (.xlsx), Access Database (.mdb)</p>
+                    <p><strong data-ms="Penyokong Browser" data-en="Supported Browsers"></strong>: Chrome, Firefox, Safari, Edge</p>
+                </div>
+            </div>
+        </section>
     </div>
 
+    <!-- SCRIPTS -->
     <script>
-        // --- KONFIGURASI SUPABASE ---
-        const SB_URL = "https://cakjtqnmqobatznznhydt.supabase.co"; 
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNha2p0cXdub2JxenR6bnpoZHl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NjQ2NzQsImV4cCI6MjA5MzE0MDY3NH0.FGiOLDprt-cA_VM32YraV7FqaRpw90pxVljorz_bdoo";
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+        // ============== LOCALIZATION ==============
+        const translations = {
+            ms: {},
+            en: {}
+        };
 
-        let currentUser = null;
+        let currentLang = localStorage.getItem('language') || 'ms';
 
-        // --- AUTH ENGINE ---
-        async function checkSession() {
-            const { data: { session } } = await supabase.auth.getSession();
-            handleAuth(session);
+        // Initialize translations from HTML
+        document.querySelectorAll('[data-ms][data-en]').forEach(el => {
+            const ms = el.getAttribute('data-ms');
+            const en = el.getAttribute('data-en');
+            if (ms) translations.ms[ms] = ms;
+            if (en) translations.en[en] = en;
+        });
 
-            supabase.auth.onAuthStateChange((event, session) => {
-                console.log("Auth Event:", event);
-                handleAuth(session);
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('language', lang);
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            document.querySelectorAll('[data-ms][data-en]').forEach(el => {
+                const ms = el.getAttribute('data-ms');
+                const en = el.getAttribute('data-en');
+                el.textContent = currentLang === 'ms' ? ms : en;
             });
         }
 
-        function handleAuth(session) {
-            if (session) {
-                currentUser = session.user;
-                document.getElementById('auth-overlay').classList.add('hidden');
-                document.getElementById('main-app').classList.remove('hidden');
-                document.getElementById('user-email').innerText = currentUser.email;
-                if(currentUser.user_metadata.avatar_url) {
-                    document.getElementById('user-avatar').innerHTML = `<img src="${currentUser.user_metadata.avatar_url}">`;
-                }
-                loadUserData();
-            } else {
-                document.getElementById('auth-overlay').classList.remove('hidden');
-                document.getElementById('main-app').classList.add('hidden');
-            }
+        document.getElementById('langToggle').addEventListener('click', () => {
+            const newLang = currentLang === 'ms' ? 'en' : 'ms';
+            setLanguage(newLang);
+            document.getElementById('langToggle').textContent = newLang === 'ms' ? 'EN / MS' : 'MS / EN';
+        });
+
+        // ============== CLOCK & TIME ==============
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('ms-MY', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const date = now.toLocaleDateString('ms-MY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('clockTime').textContent = time;
+            document.getElementById('clockDate').textContent = date;
         }
 
-        async function loginGoogle() {
-            document.getElementById('auth-status').classList.remove('hidden');
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: { 
-                    redirectTo: window.location.origin + window.location.pathname 
-                }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // ============== SECTION SWITCHING ==============
+        function switchSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // ============== PROFILE WIDGET ==============
+        function updateProfileWidget() {
+            const name = localStorage.getItem('userName') || 'Pengguna';
+            const dept = localStorage.getItem('userDept') || 'Jabatan';
+            document.getElementById('profileName').textContent = name;
+            document.getElementById('profileDept').textContent = dept;
+            document.getElementById('profileAvatar').textContent = name.substring(0, 2).toUpperCase();
+        }
+
+        updateProfileWidget();
+
+        // ============== TIME CARD FUNCTIONS ==============
+        function generateCardA() {
+            const tbody = document.getElementById('bodyCardA');
+            tbody.innerHTML = '';
+            const daysInMonth = new Date(2026, 4, 0).getDate();
+            
+            for (let i = 1; i <= 15; i++) {
+                if (i > daysInMonth) break;
+                const row = `
+                    <tr>
+                        <td>${i}</td>
+                        <td><input type="date" class="cardA-date" value="2026-05-0${i.toString().padStart(2, '0')}" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"></td>
+                        <td><input type="time" class="cardA-in1" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"></td>
+                        <td><input type="time" class="cardA-out1" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"></td>
+                        <td><input type="time" class="cardA-in2" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"></td>
+                        <td><input type="time" class="cardA-out2" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"></td>
+                        <td><input type="text" class="cardA-remarks" placeholder="Kenyataan" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"></td>
+                        <td><span class="cardA-ot">-</span></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            }
+            showAlert(currentLang === 'ms' ? 'Jadual Jana Selesai' : 'Table Generated Successfully', 'success');
+        }
+
+        function generateCardB() {
+            const tbody = document.getElementById('bodyCardB');
+            tbody.innerHTML = '';
+            const daysInMonth = 31;
+            
+            for (let i = 16; i <= daysInMonth; i++) {
+                const row = `
+                    <tr>
+                        <td>${i}</td>
+                        <td><input type="date" class="cardB-date" value="2026-05-${i.toString().padStart(2, '0')}" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"></td>
+                        <td><input type="time" class="cardB-in1" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"></td>
+                        <td><input type="time" class="cardB-out1" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"></td>
+                        <td><input type="time" class="cardB-in2" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"></td>
+                        <td><input type="time" class="cardB-out2" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"></td>
+                        <td><input type="text" class="cardB-remarks" placeholder="Kenyataan" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"></td>
+                        <td><span class="cardB-ot">-</span></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            }
+            showAlert(currentLang === 'ms' ? 'Jadual Jana Selesai' : 'Table Generated Successfully', 'success');
+        }
+
+        function printCardA() {
+            window.print();
+        }
+
+        function printCardB() {
+            window.print();
+        }
+
+        function exportCardA() {
+            exportToCSV('cardA_name', 'TimeCard_A');
+        }
+
+        function exportCardB() {
+            exportToCSV('cardB_name', 'TimeCard_B');
+        }
+
+        // ============== VEHICLE LOG FUNCTIONS ==============
+        let travelRecords = [];
+
+        function addTravelRecord() {
+            const record = {
+                id: Date.now(),
+                date: document.getElementById('travelDate').value,
+                timeOut: document.getElementById('travelTimeOut').value,
+                timeIn: document.getElementById('travelTimeIn').value,
+                driver: document.getElementById('travelDriver').value,
+                purpose: document.getElementById('travelPurpose').value,
+                approval: document.getElementById('travelApproval').value,
+                user: document.getElementById('travelUser').value,
+                odoStart: parseFloat(document.getElementById('travelOdoStart').value) || 0,
+                odoEnd: parseFloat(document.getElementById('travelOdoEnd').value) || 0,
+                distance: parseFloat(document.getElementById('travelDistance').value) || 0,
+                cost: parseFloat(document.getElementById('travelCost').value) || 0,
+                receiptNo: document.getElementById('travelReceiptNo').value,
+                liters: parseFloat(document.getElementById('travelLiters').value) || 0,
+                notes: document.getElementById('travelNotes').value
+            };
+
+            travelRecords.push(record);
+            localStorage.setItem('travelRecords', JSON.stringify(travelRecords));
+            clearTravelForm();
+            renderTravelTable();
+            updateTravelSummary();
+            showAlert(currentLang === 'ms' ? 'Rekod Ditambah' : 'Record Added', 'success');
+        }
+
+        function clearTravelForm() {
+            document.getElementById('travelDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('travelTimeOut').value = '';
+            document.getElementById('travelTimeIn').value = '';
+            document.getElementById('travelDriver').value = '';
+            document.getElementById('travelPurpose').value = '';
+            document.getElementById('travelApproval').value = '';
+            document.getElementById('travelUser').value = '';
+            document.getElementById('travelOdoStart').value = '';
+            document.getElementById('travelOdoEnd').value = '';
+            document.getElementById('travelDistance').value = '';
+            document.getElementById('travelCost').value = '';
+            document.getElementById('travelReceiptNo').value = '';
+            document.getElementById('travelLiters').value = '';
+            document.getElementById('travelNotes').value = '';
+        }
+
+        function renderTravelTable() {
+            const tbody = document.getElementById('travelTableBody');
+            tbody.innerHTML = '';
+
+            if (travelRecords.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; color:#999;">${currentLang === 'ms' ? 'Tiada rekod' : 'No records'}</td></tr>`;
+                return;
+            }
+
+            travelRecords.forEach((record, index) => {
+                const row = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${record.date}</td>
+                        <td>${record.timeOut}</td>
+                        <td>${record.timeIn}</td>
+                        <td>${record.driver}</td>
+                        <td>${record.purpose}</td>
+                        <td>${record.odoStart}</td>
+                        <td>${record.odoEnd}</td>
+                        <td>${record.distance}</td>
+                        <td>RM ${record.cost.toFixed(2)}</td>
+                        <td>${record.liters.toFixed(2)}</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="deleteTravelRecord(${record.id})">✕</button></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
             });
-            if (error) {
-                alert("Ralat Login: " + error.message);
-                document.getElementById('auth-status').classList.add('hidden');
+        }
+
+        function deleteTravelRecord(id) {
+            travelRecords = travelRecords.filter(r => r.id !== id);
+            localStorage.setItem('travelRecords', JSON.stringify(travelRecords));
+            renderTravelTable();
+            updateTravelSummary();
+            showAlert(currentLang === 'ms' ? 'Rekod Dipadam' : 'Record Deleted', 'success');
+        }
+
+        function updateTravelSummary() {
+            const totalDistance = travelRecords.reduce((sum, r) => sum + r.distance, 0);
+            const totalCost = travelRecords.reduce((sum, r) => sum + r.cost, 0);
+            const totalLiters = travelRecords.reduce((sum, r) => sum + r.liters, 0);
+
+            document.getElementById('totalDistance').textContent = `${totalDistance} KM`;
+            document.getElementById('totalCost').textContent = `RM ${totalCost.toFixed(2)}`;
+            document.getElementById('totalLiters').textContent = `${totalLiters.toFixed(2)} Liter`;
+            document.getElementById('grandTotal').textContent = `RM ${totalCost.toFixed(2)}`;
+        }
+
+        // Auto-calculate distance when odometer values change
+        document.getElementById('travelOdoStart').addEventListener('change', updateDistance);
+        document.getElementById('travelOdoEnd').addEventListener('change', updateDistance);
+
+        function updateDistance() {
+            const start = parseFloat(document.getElementById('travelOdoStart').value) || 0;
+            const end = parseFloat(document.getElementById('travelOdoEnd').value) || 0;
+            const distance = end - start;
+            document.getElementById('travelDistance').value = distance > 0 ? distance : 0;
+        }
+
+        function printVehicleLog() {
+            window.print();
+        }
+
+        function exportVehicleLog(format) {
+            if (format === 'csv') {
+                exportToCSV('vehicleReg', `VehicleLog_${new Date().toISOString().split('T')[0]}`);
+            } else if (format === 'excel') {
+                showAlert(currentLang === 'ms' ? 'Fungsi Excel sedang dibangunkan' : 'Excel function in development', 'warning');
+            } else if (format === 'access') {
+                showAlert(currentLang === 'ms' ? 'Fungsi Access DB sedang dibangunkan' : 'Access DB function in development', 'warning');
             }
         }
 
-        async function logout() {
-            if(confirm("Log keluar sekarang?")) {
-                await supabase.auth.signOut();
+        // ============== FILE UPLOAD FUNCTIONS ==============
+        const uploadData = {
+            fuelReceipt: [],
+            tngReceipt: [],
+            odometer: []
+        };
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.currentTarget.classList.remove('dragover');
+        }
+
+        function handleDrop(event, type) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('dragover');
+            const files = event.dataTransfer.files;
+            processFiles(files, type);
+        }
+
+        function handleFileSelect(event, type) {
+            const files = event.target.files;
+            processFiles(files, type);
+        }
+
+        function processFiles(files, type) {
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const item = {
+                        id: Date.now() + Math.random(),
+                        name: file.name,
+                        data: e.target.result,
+                        type: file.type,
+                        size: file.size,
+                        uploadDate: new Date().toISOString()
+                    };
+                    uploadData[type].push(item);
+                    localStorage.setItem(`upload_${type}`, JSON.stringify(uploadData[type]));
+                    renderGallery(type);
+                    showAlert(currentLang === 'ms' ? `Fail: ${file.name} dimuat naik` : `File: ${file.name} uploaded`, 'success');
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderGallery(type) {
+            const galleryId = `${type}Gallery`;
+            const gallery = document.getElementById(galleryId);
+            gallery.innerHTML = '';
+
+            uploadData[type].forEach(item => {
+                const isImage = item.type.startsWith('image/');
+                const thumb = `
+                    <div class="media-item">
+                        ${isImage ? `<img src="${item.data}" alt="${item.name}">` : `<div style="font-size:48px; text-align:center;">📄</div>`}
+                        <button class="media-item-delete" onclick="deleteUpload('${type}', ${item.id})">✕</button>
+                    </div>
+                `;
+                gallery.innerHTML += thumb;
+            });
+        }
+
+        function deleteUpload(type, id) {
+            uploadData[type] = uploadData[type].filter(item => item.id !== id);
+            localStorage.setItem(`upload_${type}`, JSON.stringify(uploadData[type]));
+            renderGallery(type);
+            showAlert(currentLang === 'ms' ? 'Fail dipadam' : 'File deleted', 'success');
+        }
+
+        // ============== SETTINGS FUNCTIONS ==============
+        function saveSettings() {
+            const name = document.getElementById('settingName').value || 'Pengguna';
+            const dept = document.getElementById('settingDept').value || 'Jabatan';
+            const section = document.getElementById('settingSection').value;
+            const email = document.getElementById('settingEmail').value;
+
+            localStorage.setItem('userName', name);
+            localStorage.setItem('userDept', dept);
+            localStorage.setItem('userSection', section);
+            localStorage.setItem('userEmail', email);
+
+            updateProfileWidget();
+            showAlert(currentLang === 'ms' ? 'Tetapan Disimpan' : 'Settings Saved', 'success');
+        }
+
+        function clearAllData() {
+            if (confirm(currentLang === 'ms' ? 'Adakah anda pasti? Semua data akan dihapus.' : 'Are you sure? All data will be deleted.')) {
+                localStorage.clear();
                 location.reload();
             }
         }
 
-        // --- UI LOGIC ---
-        function initTables() {
-            const bodyA = document.getElementById('wfb-a-body');
-            const bodyB = document.getElementById('wfb-b-body');
-            bodyA.innerHTML = ''; bodyB.innerHTML = '';
-            for(let i=1; i<=15; i++) bodyA.innerHTML += createWfbRow();
-            for(let i=16; i<=31; i++) bodyB.innerHTML += createWfbRow();
-            for(let i=0; i<3; i++) addLogRow();
+        // ============== UTILITY FUNCTIONS ==============
+        function showAlert(message, type = 'info') {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            document.body.insertBefore(alert, document.body.firstChild);
+            setTimeout(() => alert.remove(), 3000);
         }
 
-        function createWfbRow() {
-            return `<tr class="border-b border-white/5">
-                <td class="p-1"><input type="date" class="bg-transparent w-full outline-none text-white"></td>
-                <td class="p-1"><input type="time" class="bg-transparent w-full outline-none text-white" onchange="checkTime(this)"></td>
-                <td class="p-1"><input type="time" class="bg-transparent w-full outline-none text-white"></td>
-                <td class="p-1"><input type="time" class="bg-transparent w-full outline-none text-white"></td>
-                <td class="p-1"><input type="time" class="bg-transparent w-full outline-none text-white"></td>
-                <td class="p-1"><input type="text" class="bg-transparent w-full outline-none text-[10px]" placeholder="..."></td>
-            </tr>`;
+        function exportToCSV(filename, name) {
+            const csv = 'Name,Department,Section,Month,Date,In 1,Out 1,In 2,Out 2,Remarks,OT\n';
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
+            element.setAttribute('download', `${name}_${new Date().toISOString().split('T')[0]}.csv`);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            showAlert(currentLang === 'ms' ? 'Data Dieksport' : 'Data Exported', 'success');
         }
 
-        function checkTime(el) {
-            if(!el.value) return;
-            const hour = parseInt(el.value.split(':')[0]);
-            const min = parseInt(el.value.split(':')[1]);
-            // Contoh Merah: Jika masuk selepas 9:00 AM
-            if(hour > 9 || (hour === 9 && min > 0)) el.parentElement.classList.add('red-alert');
-            else el.parentElement.classList.remove('red-alert');
-        }
+        // ============== LOAD DATA ==============
+        function loadAllData() {
+            const savedRecords = localStorage.getItem('travelRecords');
+            if (savedRecords) {
+                travelRecords = JSON.parse(savedRecords);
+                renderTravelTable();
+                updateTravelSummary();
+            }
 
-        function addLogRow() {
-            const html = `<tr class="border-b border-white/5">
-                <td class="p-2"><input type="date" class="bg-transparent w-full outline-none"></td>
-                <td class="p-2"><input type="text" placeholder="08:00 AM" class="bg-transparent w-full outline-none"></td>
-                <td class="p-2"><input type="text" class="bg-transparent w-full outline-none"></td>
-                <td class="p-2"><input type="text" class="bg-transparent w-full outline-none"></td>
-                <td class="p-2"><input type="number" class="bg-transparent w-full outline-none odo-end font-bold text-yellow-400" oninput="recalcLogs()"></td>
-                <td class="p-2"><input type="text" readonly class="bg-transparent w-full outline-none text-gray-500 font-bold row-jarak"></td>
-                <td class="p-2"><input type="number" step="0.01" class="bg-transparent w-full outline-none"></td>
-                <td class="p-2"><input type="number" step="0.01" class="bg-transparent w-full outline-none"></td>
-            </tr>`;
-            document.getElementById('log-body').insertAdjacentHTML('beforeend', html);
-        }
-
-        function recalcLogs() {
-            let startOdo = parseFloat(document.getElementById('v_odo').value) || 0;
-            const rows = document.querySelectorAll('#log-body tr');
-            rows.forEach((row, i) => {
-                let endOdo = parseFloat(row.querySelector('.odo-end').value) || 0;
-                let fieldJarak = row.querySelector('.row-jarak');
-                if(endOdo > 0) {
-                    let prevOdo = (i === 0) ? startOdo : parseFloat(rows[i-1].querySelector('.odo-end').value) || startOdo;
-                    fieldJarak.value = (endOdo - prevOdo).toFixed(1) + " KM";
+            const uploadTypes = ['fuelReceipt', 'tngReceipt', 'odometer'];
+            uploadTypes.forEach(type => {
+                const saved = localStorage.getItem(`upload_${type}`);
+                if (saved) {
+                    uploadData[type] = JSON.parse(saved);
+                    renderGallery(type);
                 }
             });
+
+            const savedName = localStorage.getItem('userName');
+            const savedDept = localStorage.getItem('userDept');
+            if (savedName) document.getElementById('settingName').value = savedName;
+            if (savedDept) document.getElementById('settingDept').value = savedDept;
         }
 
-        // --- DATA SYNC ---
-        async function syncToCloud() {
-            if(!currentUser) return;
-            const btn = document.getElementById('btnSync');
-            const originalText = btn.innerHTML;
-            btn.disabled = true; 
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin text-2xl"></i> SEDANG SIMPAN...';
-
-            const payload = {
-                id: currentUser.id,
-                nama: document.getElementById('p_nama').value,
-                jabatan: document.getElementById('p_jab').value,
-                bahagian: document.getElementById('p_bah').value,
-                bulan_rekod: document.getElementById('p_bulan').value,
-                no_plat: document.getElementById('v_plat').value,
-                model_kereta: document.getElementById('v_model').value,
-                odo_permulaan: parseFloat(document.getElementById('v_odo').value) || 0,
-                updated_at: new Date()
-            };
-
-            const { error } = await supabase.from('profiles').upsert(payload);
-
-            if(error) alert("Ralat Cloud: " + error.message);
-            else alert("✅ Data berjaya dikemaskini ke Cloud!");
-            
-            btn.disabled = false; btn.innerHTML = originalText;
-        }
-
-        async function loadUserData() {
-            const { data, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-            if (data) {
-                document.getElementById('p_nama').value = data.nama || '';
-                document.getElementById('p_jab').value = data.jabatan || '';
-                document.getElementById('p_bah').value = data.bahagian || '';
-                document.getElementById('p_bulan').value = data.bulan_rekod || '';
-                document.getElementById('v_plat').value = data.no_plat || '';
-                document.getElementById('v_model').value = data.model_kereta || '';
-                document.getElementById('v_odo').value = data.odo_permulaan || 0;
-                recalcLogs();
-            }
-        }
-
-        function exportCSV() {
-            let csv = "TARIKH,ODO AKHIR,KOS,LITER\n";
-            document.querySelectorAll('#log-body tr').forEach(row => {
-                const inp = row.querySelectorAll('input');
-                if(inp[0].value) csv += `${inp[0].value},${inp[4].value},${inp[6].value},${inp[7].value}\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `Log_Premium_${document.getElementById('p_nama').value}.csv`;
-            a.click();
-        }
-
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleString('ms-MY', { day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true }).toUpperCase();
-        }, 1000);
-
-        window.onload = () => { 
-            initTables(); 
-            checkSession(); 
-        };
+        loadAllData();
+        updateLanguage();
     </script>
 </body>
 </html>
