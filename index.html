@@ -620,14 +620,14 @@
        ======================================================== */
     // TUKAR KREDENSIAL INI DENGAN URL DAN KEY SUPABASE ANDA
     const SUPABASE_URL = 'https://cakjtqwnobqztznzhdyt.supabase.co';
-    const SUPABASE_KEY = 'YOUR_ANON_KEY';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNha2p0cXdub2JxenR6bnpoZHl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NjQ2NzQsImV4cCI6MjA5MzE0MDY3NH0.FGiOLDprt-cA_VM32YraV7FqaRpw90pxVljorz_bdoo';
     
     let supabaseClient = null;
     let currentUser = null;
     let totalKosSemasa = 0;
 
     try {
-      if(SUPABASE_KEY !== 'YOUR_ANON_KEY') {
+      if(SUPABASE_KEY !== 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNha2p0cXdub2JxenR6bnpoZHl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NjQ2NzQsImV4cCI6MjA5MzE0MDY3NH0.FGiOLDprt-cA_VM32YraV7FqaRpw90pxVljorz_bdoo') {
         supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       } else {
         document.getElementById('setupNotice')?.classList.remove('hidden');
