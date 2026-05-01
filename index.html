@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Log Kerajaan Enterprise v3.0.0-PRO</title>
+  <title>Sistem Log Kerajaan Enterprise v3.1.0-PRO</title>
 
   <!-- Favicon Jata Negara -->
   <link rel="icon" type="image/svg+xml"
@@ -278,7 +278,7 @@
       <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" alt="Jata Negara"
         class="w-24 h-24 mx-auto mb-6 drop-shadow-lg">
       <h1 class="text-3xl font-bold mb-2 tracking-wide text-white">Sistem Log Kerajaan Enterprise</h1>
-      <p class="text-slate-300 mb-8 text-sm">Log masuk untuk merekod Kad Waktu dan Buku Log Kenderaan (v3.0.0-PRO).</p>
+      <p class="text-slate-300 mb-8 text-sm">Log masuk untuk merekod Kad Waktu dan Buku Log Kenderaan (v3.1.0-PRO).</p>
 
       <div id="setupNotice"
         class="mb-6 p-4 bg-yellow-500/20 border border-yellow-500/50 rounded-lg text-left text-sm text-yellow-200 hidden">
@@ -987,6 +987,54 @@
       document.getElementById('vlBulan').value = monthStr;
 
       generateTimecardRows();
+      
+      // Muat data dari localStorage jika ada
+      loadFromLocalStorage();
+    }
+    
+    // Muat dan paparkan data dari localStorage
+    function loadFromLocalStorage() {
+      const wfbData = getLocalStorageData('wfb_records');
+      const logbookData = getLocalStorageData('logbook_records');
+      
+      const tbody = document.getElementById('dataTableBody');
+      let hasData = false;
+      
+      // Paparkan data WFB
+      wfbData.forEach(data => {
+        hasData = true;
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-slate-800/50 transition-colors';
+        row.innerHTML = `
+          <td class="p-4">${data.bulan || '-'} (Sepanjang Bulan)</td>
+          <td class="p-4"><span class="bg-blue-900/50 text-blue-300 text-xs px-2 py-1 rounded border border-blue-500/30">Kad Waktu</span></td>
+          <td class="p-4 text-sm truncate max-w-xs">Rekod Kedatangan (Local)</td>
+          <td class="p-4 text-amber-400 font-bold">-</td>
+          <td class="p-4 text-slate-500 text-xs">Simpanan Tempatan</td>
+        `;
+        tbody.prepend(row);
+      });
+      
+      // Paparkan data Logbook
+      logbookData.forEach(data => {
+        hasData = true;
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-slate-800/50 transition-colors';
+        row.innerHTML = `
+          <td class="p-4">${data.tarikh || '-'}</td>
+          <td class="p-4"><span class="bg-purple-900/50 text-purple-300 text-xs px-2 py-1 rounded border border-purple-500/30">Buku Log</span></td>
+          <td class="p-4 text-sm truncate max-w-xs">${data.tujuan || '-'}</td>
+          <td class="p-4 text-emerald-400 font-bold">RM ${data.kos || '0'}</td>
+          <td class="p-4 text-slate-500 text-xs">Simpanan Tempatan</td>
+        `;
+        tbody.prepend(row);
+      });
+      
+      // Kira jumlah kos dari localStorage
+      if (logbookData.length > 0) {
+        const total = logbookData.reduce((sum, item) => sum + (parseFloat(item.kos) || 0), 0);
+        document.getElementById('vlTotalKos').innerText = "RM " + total.toFixed(2);
+      }
     }
 
     /* ========================================================
@@ -1071,12 +1119,31 @@
 
         if (error) {
           console.error(error);
-          alert("Ralat Supabase: " + error.message);
+          // Simpan ke localStorage sebagai fallback jika Supabase gagal
+          saveToLocalStorage('wfb_records', {
+            nama: document.getElementById('tcNama').value,
+            jabatan: document.getElementById('tcJab').value,
+            bahagian: document.getElementById('tcBahagian').value,
+            bulan: tcBulan,
+            data_harian: dataHarian,
+            saved_at: new Date().toISOString()
+          });
+          alert("Ralat Supabase: " + error.message + "\nData disimpan secara tempatan (localStorage).");
           btn.innerHTML = originalHtml;
           btn.classList.remove('bg-emerald-400');
           btn.disabled = false;
           return;
         }
+      } else {
+        // Simpan ke localStorage jika tiada sambungan Supabase
+        saveToLocalStorage('wfb_records', {
+          nama: document.getElementById('tcNama').value,
+          jabatan: document.getElementById('tcJab').value,
+          bahagian: document.getElementById('tcBahagian').value,
+          bulan: tcBulan,
+          data_harian: dataHarian,
+          saved_at: new Date().toISOString()
+        });
       }
 
       const tbody = document.getElementById('dataTableBody');
@@ -1217,9 +1284,54 @@
 
         if (error) {
           console.error(error);
-          alert("Ralat Supabase: " + error.message);
+          // Simpan ke localStorage sebagai fallback jika Supabase gagal
+          saveToLocalStorage('logbook_records', {
+            bulan_rekod: document.getElementById('vlBulan').value,
+            no_plat: document.getElementById('vlPlat').value,
+            model_kereta: document.getElementById('vlModel').value,
+            bahagian_unit: document.getElementById('vlUnit').value,
+            tarikh: dataObj.tarikh !== '-' ? dataObj.tarikh : null,
+            masa_pergi: dataObj.masaPergi || null,
+            masa_balik: dataObj.masaBalik || null,
+            pemandu: dataObj.pemandu,
+            pengguna: dataObj.pengguna,
+            tujuan: dataObj.tujuan,
+            odo_awal: dataObj.odoAwal ? parseFloat(dataObj.odoAwal) : null,
+            odo_akhir: dataObj.odoAkhir ? parseFloat(dataObj.odoAkhir) : null,
+            jarak: dataObj.jarak ? parseFloat(dataObj.jarak) : null,
+            kos: dataObj.kos ? parseFloat(dataObj.kos) : null,
+            no_resit: dataObj.noResit,
+            liter: dataObj.liter ? parseFloat(dataObj.liter) : null,
+            pelulus: dataObj.pelulus,
+            nota: dataObj.nota,
+            saved_at: new Date().toISOString()
+          });
+          alert("Ralat Supabase: " + error.message + "\nData disimpan secara tempatan (localStorage).");
           return;
         }
+      } else {
+        // Simpan ke localStorage jika tiada sambungan Supabase
+        saveToLocalStorage('logbook_records', {
+          bulan_rekod: document.getElementById('vlBulan').value,
+          no_plat: document.getElementById('vlPlat').value,
+          model_kereta: document.getElementById('vlModel').value,
+          bahagian_unit: document.getElementById('vlUnit').value,
+          tarikh: dataObj.tarikh !== '-' ? dataObj.tarikh : null,
+          masa_pergi: dataObj.masaPergi || null,
+          masa_balik: dataObj.masaBalik || null,
+          pemandu: dataObj.pemandu,
+          pengguna: dataObj.pengguna,
+          tujuan: dataObj.tujuan,
+          odo_awal: dataObj.odoAwal ? parseFloat(dataObj.odoAwal) : null,
+          odo_akhir: dataObj.odoAkhir ? parseFloat(dataObj.odoAkhir) : null,
+          jarak: dataObj.jarak ? parseFloat(dataObj.jarak) : null,
+          kos: dataObj.kos ? parseFloat(dataObj.kos) : null,
+          no_resit: dataObj.noResit,
+          liter: dataObj.liter ? parseFloat(dataObj.liter) : null,
+          pelulus: dataObj.pelulus,
+          nota: dataObj.nota,
+          saved_at: new Date().toISOString()
+        });
       }
 
       totalKosSemasa += kos;
@@ -1271,10 +1383,31 @@
       alert("Rekod perjalanan berjaya ditambah dan boleh disemak di Pangkalan Data!");
     }
 
+    // Fungsi Simpan ke LocalStorage (Fallback)
+    function saveToLocalStorage(tableName, data) {
+      try {
+        const existing = JSON.parse(localStorage.getItem('slk_' + tableName) || '[]');
+        existing.push(data);
+        localStorage.setItem('slk_' + tableName, JSON.stringify(existing));
+        console.log('Data disimpan ke localStorage:', tableName);
+      } catch (e) {
+        console.error('Ralat localStorage:', e);
+      }
+    }
+
+    // Fungsi Muat Turun Data dari LocalStorage
+    function getLocalStorageData(tableName) {
+      try {
+        return JSON.parse(localStorage.getItem('slk_' + tableName) || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
     // Eksport Data ke CSV / Excel
     function exportToCSV() {
       const rows = [
-        ["Sistem Log Kerajaan Enterprise v3.0.0-PRO - Eksport Pangkalan Data"],
+        ["Sistem Log Kerajaan Enterprise v3.1.0-PRO - Eksport Pangkalan Data"],
         ["Tarikh", "Jenis Data", "Butiran", "Kos/OT"]
       ];
 
